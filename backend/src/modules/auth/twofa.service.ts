@@ -1,3 +1,4 @@
+// @ts-ignore
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import prisma from '../../lib/prisma';

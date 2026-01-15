@@ -35,15 +35,16 @@ export class MarketSentinel {
     }
 
     private startSentinels() {
-        // 10 saniyede bir verileri tazele
-        setInterval(() => this.pollCrypto(), 5000);
-        setInterval(() => this.pollStocks(), 15000);
+        // Kripto verilerini 10 saniyede bir tazele
+        setInterval(() => this.pollCrypto(), 10000);
+        // Yahoo Finance şu an rate limit atıyor, logları kirletmemek için hisseleri geçici olarak kapalı tutuyoruz
+        // setInterval(() => this.pollStocks(), 60000); 
     }
 
     private async pollCrypto() {
         try {
+            console.log('🔄 Crypto sentinel polling starting...');
             for (const symbol of SYMBOLS.KRIPTO) {
-                // Binance Public API (Ücretsiz)
                 const response = await axios.get(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol.replace('-USD', 'USDT')}`);
                 const data = response.data;
 
@@ -66,25 +67,30 @@ export class MarketSentinel {
 
     private async pollStocks() {
         try {
+            console.log('🔄 Stock sentinel polling starting...');
             const allStocks = [...SYMBOLS.BIST, ...SYMBOLS.US];
             for (const symbol of allStocks) {
-                // Yahoo Finance (Ücretsiz katman)
-                const result = await yahooFinance.quote(symbol);
+                // Rate limit yememek için her sembol arası 1.5 sn bekle
+                await new Promise(resolve => setTimeout(resolve, 1500));
 
-                this.updateCache({
-                    symbol,
-                    price: result.regularMarketPrice || 0,
-                    change: result.regularMarketChange || 0,
-                    changePercent: result.regularMarketChangePercent || 0,
-                    high: result.regularMarketDayHigh || 0,
-                    low: result.regularMarketDayLow || 0,
-                    volume: result.regularMarketVolume || 0,
-                    source: 'YAHOO',
-                    updatedAt: Date.now()
-                });
+                try {
+                    const result = await yahooFinance.quote(symbol);
+                    this.updateCache({
+                        symbol,
+                        price: result.regularMarketPrice || 0,
+                        change: result.regularMarketChange || 0,
+                        changePercent: result.regularMarketChangePercent || 0,
+                        high: result.regularMarketDayHigh || 0,
+                        low: result.regularMarketDayLow || 0,
+                        volume: result.regularMarketVolume || 0,
+                        source: 'YAHOO',
+                        updatedAt: Date.now()
+                    });
+                } catch (innerError: any) {
+                    console.error(`Error polling ${symbol}:`, innerError.message);
+                }
             }
         } catch (e) {
-            // Yahoo bazen rate limit atabilir, session reset gerekebilir
             console.error('Stock sentinel error:', e);
         }
     }

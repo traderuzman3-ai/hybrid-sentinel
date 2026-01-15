@@ -30,14 +30,14 @@ export class MarginService {
             // Basitleştirilmiş likidasyon mantığı
             // Eğer fiyat giriş fiyatından %10 (10x kaldıraçta) ters yöne giderse likidasyon olur
             // Bu sadece simülasyondur.
-            const pnlPercent = pos.pnl / (Math.abs(pos.amount) * pos.entryPrice);
+            const pnlPercent = pos.pnl / (Math.abs(pos.quantity) * pos.entryPrice);
 
             if (pnlPercent < -0.1) {
                 console.warn(`[LIQUIDATION] User ${userId} position on ${pos.symbol} is liquidating!`);
                 // Pozisyonu kapat, sigorta fonuna devret
                 await prisma.position.update({
                     where: { id: pos.id },
-                    data: { isOpen: false, pnl: -pos.amount * pos.entryPrice }
+                    data: { isOpen: false, pnl: -pos.quantity * pos.entryPrice }
                 });
             }
         }

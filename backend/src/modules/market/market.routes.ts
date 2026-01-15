@@ -14,6 +14,7 @@ export default async function marketRoutes(fastify: FastifyInstance) {
         console.log('Client connected to Market WebSocket');
 
         const socketId = Math.random().toString(36).substring(7);
+        // @ts-ignore
         (connection.socket as any).id = socketId;
 
         // Private Stream Simulation (Faz 5.7)
@@ -22,7 +23,8 @@ export default async function marketRoutes(fastify: FastifyInstance) {
             console.log(`[WS] Private stream joined for user: ${userId}`);
         }
 
-        connection.socket.on('message', message => {
+        // @ts-ignore
+        connection.socket.on('message', (message: any) => {
             // ...
         });
 

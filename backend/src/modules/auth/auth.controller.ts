@@ -4,6 +4,7 @@ import prisma from '../../lib/prisma';
 
 // Kayıt (Register)
 export async function register(request: FastifyRequest, reply: FastifyReply) {
+    console.log('📥 YENİ KAYIT İSTEĞİ GELDİ:', request.body);
     try {
         const { email, password, firstName, lastName, phone, accountType } = request.body as {
             email: string;
@@ -13,6 +14,8 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
             phone?: string;
             accountType?: 'REAL' | 'DEMO';
         };
+
+        console.log(`- İşleniyor: ${email} (${accountType || 'REAL'})`);
 
         // Email kontrolü
         const existingUser = await prisma.user.findUnique({ where: { email } });

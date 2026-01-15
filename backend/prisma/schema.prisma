@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Kullanıcı Modeli
@@ -122,6 +122,7 @@ model Order {
   price       Float?   // Limit/Stop için
   stopPrice   Float?   // Stop order için
   status      String   @default("PENDING") // PENDING, FILLED, PARTIALLY_FILLED, CANCELLED, REJECTED
+  metadata    String?  // JSON detail for advanced orders (OCO, Bracket, etc.)
   filledAt    DateTime?
   createdAt   DateTime @default(now())
 

@@ -12,8 +12,9 @@ export interface Order {
     createdAt: Date;
 }
 
-interface OrderBookSide {
+interface OrderBookSide extends Partial<Order> {
     price: number;
+    quantity: number;
     orders: any[];
 }
 
@@ -73,7 +74,7 @@ export class MatchingEngine {
                 const matchQuantity = Math.min(bestBuy.quantity, bestSell.quantity);
 
                 // Veritabanını güncelle
-                await this.executeTrade(bestBuy, bestSell, matchQuantity);
+                await this.executeTrade(bestBuy as any, bestSell as any, matchQuantity);
 
                 // Defterden düş veya azalt
                 bestBuy.quantity -= matchQuantity;
