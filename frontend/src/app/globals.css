@@ -3,167 +3,151 @@
 @tailwind utilities;
 
 :root {
-  /* Corporate Light Theme Palette - Aurum Corporate */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-sidebar: #ffffff;
+  /* Aurum Pro - Fintech Terminal Palette */
+  --bg-app: #f0f2f5;
+  --bg-card: #ffffff;
   --bg-header: #ffffff;
 
-  --text-primary: #0f172a;
-  /* Slate 900 */
-  --text-secondary: #64748b;
-  /* Slate 500 */
-  --text-accent: #d97706;
-  /* Amber 600 - Gold */
+  /* Typography Colors */
+  --text-primary: #111827;
+  /* Gray 900 */
+  --text-secondary: #4b5563;
+  /* Gray 600 */
+  --text-muted: #9ca3af;
+  /* Gray 400 */
+  --text-accent: #b45309;
+  /* Amber 700 */
 
+  /* Semantic Colors */
   --primary-navy: #0f172a;
+  /* Slate 900 */
   --primary-blue: #2563eb;
+  /* Royal Blue */
+  --success: #059669;
+  /* Emerald 600 */
+  --danger: #dc2626;
+  /* Red 600 */
 
-  --border-color: #e2e8f0;
+  /* UI Elements */
+  --border-subtle: #e5e7eb;
+  /* Gray 200 */
+  --border-focus: #cbd5e1;
+  /* Gray 300 */
 
-  --success: #10b981;
-  --danger: #ef4444;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 6px -1px rgb(0 0 0 / 0.02);
+  --shadow-hover: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
 
-  --radius: 0.5rem;
-
-  --font-family-base: 'Inter', system-ui, sans-serif;
-  --font-family-mono: 'JetBrains Mono', monospace;
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 body {
   color: var(--text-primary);
-  background: var(--bg-primary);
-  font-family: var(--font-family-base);
+  background: var(--bg-app);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  /* Tighter tracking for professional look */
 }
 
-/* Tactile Button Style - "Tırt Tırt" Hissi */
+/* 
+   ----------------------------------------
+   COMPONENTS: Premium Fintech UI 
+   ----------------------------------------
+*/
+
+/* 1. The "Tactile" Button - Refined for Pro Use */
 .btn-tactile {
-  background: linear-gradient(to bottom, #ffffff, #f1f5f9);
-  border: 1px solid var(--border-color);
+  background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+  border: 1px solid var(--border-focus);
   color: var(--text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
+  padding: 0.375rem 0.875rem;
+  /* Smaller padding for density */
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  box-shadow: 0 3px 0 #cbd5e1, 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
-  cursor: pointer;
+  font-size: 0.875rem;
+  box-shadow: 0 1px 0 #e5e7eb;
+  transition: all 0.1s ease-out;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  user-select: none;
+}
+
+.btn-tactile:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
 }
 
 .btn-tactile:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 #cbd5e1, inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: #e5e7eb;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  transform: translateY(1px);
 }
 
+/* Primary Action Variant */
 .btn-tactile.primary {
-  background: linear-gradient(to bottom, #0f172a, #1e293b);
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
   color: white;
   border-color: #020617;
-  box-shadow: 0 3px 0 #020617, 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 
-.btn-tactile.primary:active {
-  box-shadow: 0 0 0 #020617, inset 0 2px 4px rgba(0, 0, 0, 0.2);
+.btn-tactile.primary:hover {
+  background: #334155;
 }
 
+/* Buy/Sell Variants - Crisp & Clear */
 .btn-tactile.success {
-  background: linear-gradient(to bottom, #10b981, #059669);
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
   color: white;
   border-color: #047857;
-  box-shadow: 0 3px 0 #047857, 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-tactile.success:active {
-  box-shadow: 0 0 0 #047857;
+  box-shadow: 0 1px 0 #065f46;
 }
 
 .btn-tactile.danger {
-  background: linear-gradient(to bottom, #ef4444, #dc2626);
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
   color: white;
   border-color: #b91c1c;
-  box-shadow: 0 3px 0 #b91c1c, 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 0 #991b1b;
 }
 
-.btn-tactile.danger:active {
-  box-shadow: 0 0 0 #b91c1c;
-}
-
-/* Card Style - Matte Finish */
+/* 2. Bento Grid Cards - Matter, Sharper */
 .card-matte {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-sm);
-  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .card-header {
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.75rem 1rem;
   font-weight: 600;
-  font-size: 1.125rem;
+  font-size: 0.925rem;
   color: var(--primary-navy);
-}
-
-/* Layout Utilities */
-.container-custom {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: var(--text-secondary);
-  border-radius: var(--radius);
-  transition: all 0.2s;
-  font-weight: 500;
+  justify-content: space-between;
+  background: #fafafa;
+  /* Subtle header distinction */
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
 }
 
-.sidebar-nav-item:hover {
-  background: #f1f5f9;
-  color: var(--primary-navy);
+/* 3. Data Typography */
+.font-mono-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
-.sidebar-nav-item.active {
-  background: #eff6ff;
-  color: var(--primary-blue);
-  font-weight: 600;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Ticker Animation */
+/* 4. Ticker Animation */
 @keyframes ticker {
   0% {
     transform: translateY(0);
@@ -172,4 +156,23 @@ body {
   100% {
     transform: translateY(-50%);
   }
+}
+
+/* Scrollbar Polish */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }

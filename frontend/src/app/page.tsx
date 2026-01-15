@@ -1,10 +1,10 @@
 'use client';
 
 import AccountSwitch from '../components/AccountSwitch';
-import { MarketChart } from '../components/MarketChart'; // Re-using existing chart for now
+import { MarketChart } from '../components/MarketChart';
 import { useState } from 'react';
 
-// Mock Data for ASELS - we would fetch this in reality
+// Mock Data for ASELS
 const MOCK_DATA = [
     { time: '2023-12-22', open: 62.50, high: 63.80, low: 62.10, close: 63.20 },
     { time: '2023-12-23', open: 63.20, high: 64.50, low: 63.00, close: 64.10 },
@@ -18,79 +18,120 @@ const MOCK_DATA = [
 
 export default function Home() {
     return (
-        <div className="container-custom py-6">
+        <div className="flex flex-col h-full bg-bg-app p-2 gap-2">
 
-            {/* Account Switcher - Centered Top */}
-            <AccountSwitch />
-
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-12 gap-6">
-
-                {/* Chart Area - 8 Columns */}
-                <div className="col-span-12 lg:col-span-9">
-                    <div className="card-matte h-[500px] flex flex-col">
-                        <div className="card-header flex justify-between items-center">
-                            <div className="flex items-baseline gap-3">
-                                <span className="text-2xl font-bold text-primary-navy">ASELS</span>
-                                <span className="text-sm text-text-secondary">ASELSAN ELEKTRONİK SANAYİ TİC. A.Ş.</span>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-2xl font-bold text-success">68.90 ₺</div>
-                                <div className="text-xs text-success bg-green-50 px-2 py-1 rounded inline-block font-semibold">
-                                    ▲ %2.10
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 bg-white border border-gray-100 rounded-lg overflow-hidden relative">
-                            {/* Chart Component would be fully interactive here. 
-                                 Using MarketChart but styling needs to be passed or updated for Light Mode 
-                             */}
-                            <div className="absolute inset-0 flex items-center justify-center text-text-secondary">
-                                <MarketChart
-                                    data={MOCK_DATA}
-                                    colors={{
-                                        upColor: '#10b981',
-                                        downColor: '#ef4444',
-                                        backgroundColor: 'transparent',
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Order Buttons Panel */}
-                    <div className="mt-6 grid grid-cols-2 gap-4">
-                        <button className="btn-tactile success text-lg py-4">
-                            AL (ASELS)
-                        </button>
-                        <button className="btn-tactile danger text-lg py-4">
-                            SAT (ASELS)
-                        </button>
+            {/* Top Control Bar: Reduced height, high density */}
+            <div className="flex items-center justify-between bg-bg-card border border-border-subtle rounded-md px-3 py-2 shadow-sm h-12 shrink-0">
+                <div className="flex items-center gap-4">
+                    <AccountSwitch />
+                    <div className="h-4 w-px bg-border-subtle"></div>
+                    <div className="flex items-baseline gap-2">
+                        <h1 className="text-lg font-bold text-primary-navy tracking-tight">ASELS</h1>
+                        <span className="text-xs text-text-secondary font-medium">ASELSAN ELEKTRONİK</span>
                     </div>
                 </div>
 
-                {/* Right Side / Order Book or Details - 3 Columns */}
-                <div className="col-span-12 lg:col-span-3">
-                    <div className="card-matte h-full">
-                        <div className="card-header">İşlem Özeti</div>
-                        <div className="space-y-4">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-text-secondary">Hesap Bakiyesi</span>
-                                <span className="font-mono font-bold">100.000,00 ₺</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-text-secondary">Kullanılabilir</span>
-                                <span className="font-mono font-bold">56.250,00 ₺</span>
-                            </div>
-                            <div className="h-px bg-gray-100 my-4"></div>
-                            <div className="p-3 bg-blue-50 rounded text-xs text-blue-700">
-                                Piyasa açık. Veriler 15dk gecikmelidir.
-                            </div>
+                <div className="flex items-center gap-6">
+                    <div className="text-right">
+                        <div className="text-xs text-text-muted">Son Fiyat</div>
+                        <div className="text-lg font-bold font-mono-data text-success tracking-tight">68.90 ₺</div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-xs text-text-muted">Değişim</div>
+                        <div className="text-sm font-bold font-mono-data text-success flex items-center gap-1">
+                            ▲ %2.10
+                        </div>
+                    </div>
+                    <div className="text-right hidden sm:block">
+                        <div className="text-xs text-text-muted">Hacim</div>
+                        <div className="text-sm font-medium font-mono-data text-text-primary">452.1M</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Terminal Grid */}
+            <div className="flex-1 grid grid-cols-12 gap-2 min-h-0">
+
+                {/* Center Panel: Chart (9 Columns) */}
+                <div className="col-span-12 lg:col-span-9 flex flex-col gap-2 min-h-0">
+                    <div className="card-matte flex-1 flex flex-col p-0 overflow-hidden min-h-0 relative">
+                        {/* Chart Toolbar Overlay */}
+                        <div className="absolute top-2 left-2 z-10 flex gap-1">
+                            {['1D', '1W', '1M', '3M', '1Y'].map(t => (
+                                <button key={t} className="px-2 py-0.5 text-[10px] font-medium bg-white/80 border border-gray-200 rounded hover:bg-gray-50 text-text-secondary">
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center justify-center h-full bg-white relative">
+                            <MarketChart
+                                data={MOCK_DATA}
+                                colors={{
+                                    upColor: '#10b981',
+                                    downColor: '#ef4444',
+                                    backgroundColor: 'transparent',
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
 
+                {/* Right Panel: Order Book & Entry (3 Columns) */}
+                <div className="col-span-12 lg:col-span-3 flex flex-col gap-2 min-h-0">
+
+                    {/* Order Entry Panel */}
+                    <div className="card-matte p-3 shrink-0">
+                        <div className="text-xs font-bold text-primary-navy uppercase tracking-wider mb-2 border-b border-border-subtle pb-1">Hızlı Emir</div>
+
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                            <div className="bg-gray-50 p-2 rounded border border-gray-100 text-center cursor-pointer hover:border-blue-200 transition-colors">
+                                <div className="text-[10px] text-text-secondary">Alış</div>
+                                <div className="font-mono-data font-bold text-success">68.90</div>
+                            </div>
+                            <div className="bg-gray-50 p-2 rounded border border-gray-100 text-center cursor-pointer hover:border-red-200 transition-colors">
+                                <div className="text-[10px] text-text-secondary">Satış</div>
+                                <div className="font-mono-data font-bold text-danger">68.95</div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <button className="btn-tactile success w-full justify-center py-2 text-sm shadow-sm">
+                                AL
+                            </button>
+                            <button className="btn-tactile danger w-full justify-center py-2 text-sm shadow-sm">
+                                SAT
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Account Summary - Compact */}
+                    <div className="card-matte p-3 flex-1 flex flex-col">
+                        <div className="text-xs font-bold text-primary-navy uppercase tracking-wider mb-3 border-b border-border-subtle pb-1">Portföy</div>
+
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-xs text-text-secondary">Bakiye</span>
+                                <span className="font-bold font-mono-data text-primary-navy">100.000 ₺</span>
+                            </div>
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-xs text-text-secondary">Müsait</span>
+                                <span className="font-bold font-mono-data text-success">56.250 ₺</span>
+                            </div>
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-xs text-text-secondary">Risk</span>
+                                <span className="font-bold font-mono-data text-text-primary">%45</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-auto pt-3 border-t border-border-subtle">
+                            <div className="flex items-center gap-2 text-[10px] text-text-secondary">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Piyasa açık
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
