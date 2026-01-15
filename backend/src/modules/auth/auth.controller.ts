@@ -5,12 +5,13 @@ import prisma from '../../lib/prisma';
 // Kayıt (Register)
 export async function register(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const { email, password, firstName, lastName, phone } = request.body as {
+        const { email, password, firstName, lastName, phone, accountType } = request.body as {
             email: string;
             password: string;
             firstName?: string;
             lastName?: string;
             phone?: string;
+            accountType?: 'REAL' | 'DEMO';
         };
 
         // Email kontrolü
@@ -33,8 +34,24 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                 passwordHash,
                 firstName,
                 lastName,
-                phone,
-                emailVerificationToken
+                emailVerificationToken,
+                accountType: accountType || 'REAL',
+                isEmailVerified: false, // Explicitly set default
+                // Otomatik cüzdan oluşturma
+                wallets: {
+                    create: [
+                        {
+                            currency: 'TRY',
+                            balance: accountType === 'DEMO' ? 100000 : 0, // Demo hesaplara 100.000 TL bakiye
+                            frozen: 0
+                        },
+                        {
+                            currency: 'USD',
+                            balance: accountType === 'DEMO' ? 10000 : 0, // Demo hesaplara 10.000 USD bakiye
+                            frozen: 0
+                        }
+                    ]
+                }
             },
             select: {
                 id: true,
@@ -43,6 +60,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                 lastName: true,
                 kycStatus: true,
                 accountLevel: true,
+                accountType: true,
                 createdAt: true
             }
         });
@@ -109,6 +127,7 @@ export async function login(request: FastifyRequest, reply: FastifyReply) {
         const refreshToken = reply.server.jwt.sign(
             { id: user.id },
             {
+                // @ts-ignore
                 secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
                 expiresIn: '7d'
             }
@@ -151,12 +170,13 @@ export async function refreshToken(request: FastifyRequest, reply: FastifyReply)
 
         // Refresh token doğrula
         const decoded = reply.server.jwt.verify(refreshToken, {
+            // @ts-ignore
             secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret'
         }) as { id: string };
 
         // Kullanıcı kontrolü
         const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-        if (!user || !user.isActive) {
+        if (!user) {
             return reply.status(401).send({ error: 'Geçersiz token' });
         }
 
@@ -177,10 +197,12 @@ export async function refreshToken(request: FastifyRequest, reply: FastifyReply)
     }
 }
 
+
 // Profil Bilgisi
 export async function getProfile(request: FastifyRequest, reply: FastifyReply) {
     try {
         const user = (request.user as any);
+        console.log('getProfile request for user:', user);
 
         const profile = await prisma.user.findUnique({
             where: { id: user.id },
@@ -189,20 +211,22 @@ export async function getProfile(request: FastifyRequest, reply: FastifyReply) {
                 email: true,
                 firstName: true,
                 lastName: true,
-                phone: true,
                 kycStatus: true,
                 accountLevel: true,
                 isAdmin: true,
-                createdAt: true
+                createdAt: true,
+                wallets: true
             }
         });
 
         if (!profile) {
+            console.error('Profile not found for id:', user.id);
             return reply.status(404).send({ error: 'Kullanıcı bulunamadı' });
         }
 
         return reply.send({ user: profile });
     } catch (error) {
+        console.error('GET PROFILE ERROR:', error);
         request.log.error(error);
         return reply.status(500).send({ error: 'Profil bilgisi alınamadı' });
     }

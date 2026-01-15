@@ -18,6 +18,7 @@ model User {
   firstName              String?
   lastName               String?
   accountLevel           String      @default("STARTER") // STARTER, SILVER, GOLD, PLATINUM
+  accountType            String      @default("REAL")    // REAL, DEMO
   kycTier                Int         @default(0)         // 0: Unverified, 1: Basic, 2: Advanced, 3: VIP
   riskScore              Float       @default(0.0)       // AML/Internal risk score
   isAdmin                Boolean     @default(false)

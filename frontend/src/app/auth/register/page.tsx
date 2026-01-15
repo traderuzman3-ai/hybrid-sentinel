@@ -171,13 +171,27 @@ function RegisterForm() {
                         />
                     </div>
 
+                    <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            name="terms"
+                            required
+                            style={{ marginTop: '4px' }}
+                        />
+                        <label htmlFor="terms" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                            <Link href="/policy/terms" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Kullanıcı Sözleşmesi</Link>'ni ve{' '}
+                            <Link href="/policy/privacy" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Gizlilik Politikası</Link>'nı okudum ve kabul ediyorum.
+                        </label>
+                    </div>
+
                     <button
                         type="submit"
                         className="btn btn-primary"
-                        style={{ width: '100%', marginBottom: '16px' }}
+                        style={{ width: '100%', marginBottom: '16px', padding: '14px', fontSize: '16px', fontWeight: 600 }}
                         disabled={loading}
                     >
-                        {loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
+                        {loading ? 'Hesap Oluşturuluyor...' : (isDemo ? 'Demo Hesabı Başlat' : 'Gerçek Hesabı Oluştur')}
                     </button>
 
                     <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>

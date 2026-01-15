@@ -3,10 +3,18 @@
 import AccountSwitch from '../../components/AccountSwitch';
 import { MarketChart } from '../../components/MarketChart';
 import { useState } from 'react';
+import { useUser } from '../../context/UserContext';
 import { useMarket } from '../../context/MarketContext';
 
 export default function DashboardPage() {
+    const { user } = useUser();
     const { marketData, isConnected } = useMarket();
+
+    // Get TRY wallet
+    const tryWallet = user?.wallets?.find((w: any) => w.currency === 'TRY');
+    const balance = tryWallet ? tryWallet.balance : 0;
+    const available = tryWallet ? (tryWallet.balance - tryWallet.frozen) : 0;
+
     const symbol = 'ASELS.IS';
     const activeData = marketData[symbol] || {
         price: 68.90,
@@ -126,11 +134,11 @@ export default function DashboardPage() {
                         <div className="space-y-3">
                             <div className="flex justify-between items-baseline">
                                 <span className="text-xs text-text-secondary">Bakiye</span>
-                                <span className="font-bold font-mono-data text-primary-navy">100.000 ₺</span>
+                                <span className="font-bold font-mono-data text-primary-navy">{balance.toLocaleString('tr-TR')} ₺</span>
                             </div>
                             <div className="flex justify-between items-baseline">
                                 <span className="text-xs text-text-secondary">Müsait</span>
-                                <span className="font-bold font-mono-data text-success">56.250 ₺</span>
+                                <span className="font-bold font-mono-data text-success">{available.toLocaleString('tr-TR')} ₺</span>
                             </div>
                             <div className="flex justify-between items-baseline">
                                 <span className="text-xs text-text-secondary">Risk</span>
