@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from 'next/font/google';
 import "./globals.css";
 import { UserProvider } from '../context/UserContext';
@@ -11,8 +11,14 @@ export const metadata: Metadata = {
     title: 'Hybrid Sentinel - Professional Trading',
     description: 'Enterprise Grade Market Terminal',
     manifest: '/manifest.json',
+};
+
+export const viewport: Viewport = {
     themeColor: '#4cc9f0',
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
 };
 
 export default function RootLayout({
