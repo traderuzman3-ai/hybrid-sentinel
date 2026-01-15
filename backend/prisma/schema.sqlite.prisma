@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Kullanıcı Modeli
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  firstName     String?
+  lastName      String?
+  phone         String?
+  kycStatus     KycStatus @default(PENDING)
+  accountLevel  AccountLevel @default(VIEW_ONLY)
+  isActive      Boolean  @default(true)
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  ledgerEntries LedgerEntry[]
+  orders        Order[]
+  positions     Position[]
+  kycDocuments  KycDocument[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+// KYC Durumu
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RESUBMIT_REQUIRED
+}
+
+// Hesap Seviyesi
+enum AccountLevel {
+  VIEW_ONLY
+  TRADING_ENABLED
+  WITHDRAWAL_ENABLED
+}
+
+// KYC Dokümanları
+model KycDocument {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  documentType String  // "ID_CARD", "SELFIE", "ADDRESS_PROOF"
+  fileUrl     String   // Encrypted storage path
+  status      String   @default("PENDING")
+  uploadedAt  DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewedBy  String?
+
+  @@map("kyc_documents")
+}
+
+// Ledger (Defter) - Para Yönetimi
+model LedgerEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        LedgerType
+  amount      Float
+  currency    String   @default("TRY")
+  description String?
+  referenceId String?  // EFT referans numarası vb.
+  status      LedgerStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+
+  @@map("ledger_entries")
+}
+
+enum LedgerType {
+  DEPOSIT
+  WITHDRAWAL
+  TRADE_PROFIT
+  TRADE_LOSS
+  FEE
+}
+
+enum LedgerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+// Emir (Order) Modeli
+model Order {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  symbol      String   // "BTCUSDT", "AAPL", "THYAO"
+  type        OrderType
+  side        OrderSide
+  quantity    Float
+  price       Float?   // Limit/Stop için
+  stopPrice   Float?   // Stop order için
+  status      OrderStatus @default(PENDING)
+  filledAt    DateTime?
+  createdAt   DateTime @default(now())
+
+  @@map("orders")
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP
+  TAKE_PROFIT
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderStatus {
+  PENDING
+  FILLED
+  PARTIALLY_FILLED
+  CANCELLED
+  REJECTED
+}
+
+// Pozisyon (Position) Modeli
+model Position {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  symbol      String
+  side        OrderSide
+  quantity    Float
+  entryPrice  Float
+  currentPrice Float
+  pnl         Float    @default(0)
+  margin      Float
+  leverage    Float    @default(1)
+  isOpen      Boolean  @default(true)
+  openedAt    DateTime @default(now())
+  closedAt    DateTime?
+
+  @@map("positions")
+}
+
+// Fiyat Override (Admin Kontrol)
+model PriceOverride {
+  id          String   @id @default(uuid())
+  symbol      String   @unique
+  overridePrice Float
+  spread      Float?   // Spread ayarı
+  slippage    Float?   // Kayma ayarı
+  isActive    Boolean  @default(true)
+  createdBy   String   // Admin user ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("price_overrides")
+}
+
+// Audit Log (Denetim Kaydı)
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String   // "LOGIN", "DEPOSIT", "ORDER_PLACED", "PRICE_OVERRIDE"
+  details     String?  // JSON string
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}

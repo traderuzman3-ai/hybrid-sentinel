@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Kullanıcı Modeli
+model User {
+  id                     String      @id @default(uuid())
+  email                  String      @unique
+  password               String
+  firstName              String?
+  lastName               String?
+  accountLevel           String      @default("STARTER") // STARTER, SILVER, GOLD, PLATINUM
+  kycTier                Int         @default(0)         // 0: Unverified, 1: Basic, 2: Advanced, 3: VIP
+  riskScore              Float       @default(0.0)       // AML/Internal risk score
+  isAdmin                Boolean     @default(false)
+  isCorporate            Boolean     @default(false)
+  addressVerified        Boolean     @default(false)
+  
+  // Auth & Security
+  twoFASecret            String?
+  isTwoFAEnabled         Boolean     @default(false)
+  isEmailVerified        Boolean     @default(false)
+  emailVerificationToken String?
+  resetPasswordToken     String?
+  
+  kycStatus              String      @default("NOT_SUBMITTED") // NOT_SUBMITTED, PENDING, APPROVED, REJECTED
+  
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+
+  // Relations
+  ledgerEntries          LedgerEntry[]
+  wallets                Wallet[]
+  orders                 Order[]
+  positions              Position[]
+  auditLogs              AuditLog[]
+  securityLogs           SecurityLog[]
+  kycDocuments           KycDocument[]
+  priceOverrides         PriceOverride[]
+
+  @@map("users")
+}
+
+model SecurityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  event     String   // "LOGIN", "2FA_ENABLE", "PASSWORD_RESET", etc.
+  ip        String?
+  device    String?
+  createdAt DateTime @default(now())
+
+  @@map("security_logs")
+}
+
+// KYC Dokümanları
+model KycDocument {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  documentType    String   // "ID_CARD", "PASSPORT", "DRIVERS_LICENSE", "address_proof"
+  documentCountry String   @default("TR")
+  fileUrl         String   // Encrypted storage path
+  ocrData         String?  // JSON string of automated OCR results
+  livenessScore   Float?   // Result of facial liveness check
+  status          String   @default("PENDING")
+  uploadedAt      DateTime @default(now())
+  reviewedAt      DateTime?
+  reviewedBy      String?
+
+  @@map("kyc_documents")
+}
+
+// Ledger (Defter) - Para Yönetimi
+model LedgerEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // DEPOSIT, WITHDRAWAL, TRADE_PROFIT, TRADE_LOSS, FEE, TRANSFER
+  amount      Float
+  currency    String   @default("TRY")
+  description String?
+  referenceId String?  // EFT/TXID referans numarası
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, COMPLETED
+  metadata    String?  // JSON detail: bank_name, tx_hash, etc.
+  createdAt   DateTime @default(now())
+
+  @@map("ledger_entries")
+}
+
+model Wallet {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  currency    String   // "TRY", "USD", "BTC", "ETH"
+  balance     Float    @default(0)
+  frozen      Float    @default(0) // Faz 3.7 için dondurulmuş bakiye
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, currency])
+  @@map("wallets")
+}
+
+// Emir (Order) Modeli
+model Order {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  symbol      String   // "BTCUSDT", "AAPL", "THYAO"
+  type        String   // MARKET, LIMIT, STOP, TAKE_PROFIT
+  side        String   // BUY, SELL
+  quantity    Float
+  price       Float?   // Limit/Stop için
+  stopPrice   Float?   // Stop order için
+  status      String   @default("PENDING") // PENDING, FILLED, PARTIALLY_FILLED, CANCELLED, REJECTED
+  filledAt    DateTime?
+  createdAt   DateTime @default(now())
+
+  @@map("orders")
+}
+
+// Pozisyon (Position) Modeli
+model Position {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  symbol      String
+  side        String   // BUY, SELL
+  quantity    Float
+  entryPrice  Float
+  currentPrice Float
+  pnl         Float    @default(0)
+  margin      Float
+  leverage    Float    @default(1)
+  isOpen      Boolean  @default(true)
+  openedAt    DateTime @default(now())
+  closedAt    DateTime?
+
+  @@map("positions")
+}
+
+// Fiyat Override (Admin Kontrol)
+model PriceOverride {
+  id          String   @id @default(uuid())
+  symbol      String   @unique
+  overridePrice Float
+  spread      Float?   // Spread ayarı
+  slippage    Float?   // Kayma ayarı
+  isActive    Boolean  @default(true)
+  createdBy   String   // Admin user ID
+  user        User     @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("price_overrides")
+}
+
+// Audit Log (Denetim Kaydı)
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String   // "LOGIN", "DEPOSIT", "ORDER_PLACED", "PRICE_OVERRIDE"
+  details     String?  // JSON string
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}

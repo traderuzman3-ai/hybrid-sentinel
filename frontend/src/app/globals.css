@@ -1,0 +1,145 @@
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary: #8b5cf6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --dark: #0f172a;
+  --dark-light: #1e293b;
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Smooth animations */
+* {
+  transition: all 0.2s ease;
+}
+
+/* MOBILE OPTIMIZATIONS (Faz 7.1) */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    display: flex !important;
+  }
+
+  .card {
+    padding: 16px !important;
+  }
+
+  /* Dashboard grid optimizations */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Trade page layout */
+  .trade-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .trade-order-panel {
+    order: -1;
+    /* Emir paneli üste gelsin mobil için */
+  }
+
+  .glass-card {
+    border-radius: 12px !important;
+    margin-bottom: 12px;
+  }
+}
+
+/* Premium button */
+.btn {
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: var(--shadow);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: var(--dark-light);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+/* Card */
+.card {
+  background: var(--dark-light);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* Input */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 16px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
