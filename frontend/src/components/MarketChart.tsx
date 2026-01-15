@@ -93,3 +93,6 @@ export const MarketChart = ({
 
     return <div ref={chartContainerRef} style={{ width: '100%', position: 'relative' }} />;
 };
+
+// Default export for backward compatibility
+export default MarketChart;
