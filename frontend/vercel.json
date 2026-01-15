@@ -1,6 +1,9 @@
 {
     "version": 2,
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
     "framework": "nextjs",
+    "installCommand": "npm install --legacy-peer-deps",
     "regions": [
         "arn1"
     ]
