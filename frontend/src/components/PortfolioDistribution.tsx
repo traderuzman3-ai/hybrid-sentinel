@@ -11,7 +11,8 @@ export default function PortfolioDistribution() {
     }, []);
 
     const fetchDistribution = async () => {
-        const res = await fetch('http://localhost:3001/ledger/wallets', {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${baseUrl}/ledger/wallets`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         const { wallets } = await res.json();

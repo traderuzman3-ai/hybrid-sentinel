@@ -12,7 +12,8 @@ export default function WalletPage() {
     }, []);
 
     const fetchWallets = async () => {
-        const res = await fetch('http://localhost:3001/ledger/wallets', {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${baseUrl}/ledger/wallets`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         const data = await res.json();
@@ -21,7 +22,8 @@ export default function WalletPage() {
     };
 
     const handleExport = () => {
-        window.open('http://localhost:3001/ledger/export?accessToken=' + localStorage.getItem('accessToken'), '_blank');
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        window.open(`${baseUrl}/ledger/export?accessToken=` + localStorage.getItem('accessToken'), '_blank');
     };
 
     return (

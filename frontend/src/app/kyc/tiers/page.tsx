@@ -10,7 +10,8 @@ export default function KycTiers() {
     useEffect(() => {
         // Profil bilgisinden mevcut tier seviyesini çek
         const fetchTier = async () => {
-            const res = await fetch('http://localhost:3001/auth/profile', {
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+            const res = await fetch(`${baseUrl}/auth/profile`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
             });
             const data = await res.json();

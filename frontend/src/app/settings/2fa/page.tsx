@@ -10,7 +10,8 @@ export default function TwoFASetup() {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   const startSetup = async () => {
-    const res = await fetch('http://localhost:3001/auth/2fa/setup', {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const res = await fetch(`${baseUrl}/auth/2fa/setup`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
     });
     const data = await res.json();
@@ -19,7 +20,8 @@ export default function TwoFASetup() {
   };
 
   const handleEnable = async () => {
-    const res = await fetch('http://localhost:3001/auth/2fa/enable', {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const res = await fetch(`${baseUrl}/auth/2fa/enable`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

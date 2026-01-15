@@ -19,10 +19,10 @@ export default function TimeAndSales({ trades }: { trades: any[] }) {
                         {trades.map((trade) => (
                             <tr key={trade.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
                                 <td style={{ padding: '6px 4px', color: 'var(--text-secondary)' }}>{trade.time}</td>
-                                <td style={{ padding: '6px 4px', fontWeight: 'bold', color: trade.side === 'BUY' ? 'var(--success)' : 'var(--danger)' }}>
-                                    {trade.price.toLocaleString()}
+                                <td style={{ padding: '6px 4px', fontWeight: 'bold', color: trade?.side === 'BUY' ? 'var(--success)' : 'var(--danger)' }}>
+                                    {trade?.price?.toLocaleString()}
                                 </td>
-                                <td style={{ padding: '6px 4px', textAlign: 'right' }}>{trade.amount.toFixed(4)}</td>
+                                <td style={{ padding: '6px 4px', textAlign: 'right' }}>{trade?.amount?.toFixed(4)}</td>
                             </tr>
                         ))}
                     </tbody>

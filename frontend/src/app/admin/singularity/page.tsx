@@ -7,7 +7,8 @@ export default function SingularityDashboard() {
     const [metrics, setMetrics] = useState<any>(null);
 
     useEffect(() => {
-        fetch('http://localhost:3001/singularity/god-mode')
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        fetch(`${baseUrl}/singularity/god-mode`)
             .then(res => res.json())
             .then(data => setMetrics(data));
     }, []);

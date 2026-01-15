@@ -9,7 +9,9 @@ export default function MarketWatchlist() {
 
     useEffect(() => {
         // WebSocket Connection
-        const ws = new WebSocket(`ws://localhost:3001/market/ws`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const wsUrl = baseUrl.replace('https://', 'wss://').replace('http://', 'ws://');
+        const ws = new WebSocket(`${wsUrl}/market/ws`);
 
         ws.onmessage = (event) => {
             const payload = JSON.parse(event.data);

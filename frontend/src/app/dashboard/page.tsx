@@ -14,7 +14,9 @@ export default function DashboardPage() {
     const [intel, setIntel] = useState<any>(null);
 
     useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:3001/market/ws`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const wsUrl = baseUrl.replace('https://', 'wss://').replace('http://', 'ws://');
+        const ws = new WebSocket(`${wsUrl}/market/ws`);
         ws.onmessage = (e) => {
             const payload = JSON.parse(e.data);
             if (payload.intelligence) setIntel(payload.intelligence);
