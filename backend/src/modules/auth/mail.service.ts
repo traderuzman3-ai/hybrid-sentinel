@@ -1,24 +1,74 @@
+import nodemailer from 'nodemailer';
+
+// Brevo SMTP transporter
+const transporter = nodemailer.createTransport({
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.BREVO_SMTP_USER || 'a0231a001@smtp-brevo.com',
+        pass: process.env.BREVO_SMTP_KEY || ''
+    }
+});
+
+// Frontend URL for verification links
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://hybrid-sentinel-r1mg.vercel.app';
+
 export class MailService {
     /**
-     * Simüle edilmiş e-posta gönderimi.
-     * Gerçekten e-posta göndermek yerine terminale log basar.
+     * Gerçek e-posta gönderimi (Brevo SMTP ile)
      */
-    public static async sendMail(to: string, subject: string, body: string) {
-        console.log("------------------------------------------");
-        console.log(`📧 E-POSTA GÖNDERİLDİ: ${to}`);
-        console.log(`📌 KONU: ${subject}`);
-        console.log(`📝 İÇERİK: ${body}`);
-        console.log("------------------------------------------");
-        return true;
+    public static async sendMail(to: string, subject: string, html: string) {
+        try {
+            const info = await transporter.sendMail({
+                from: '"Hybrid Sentinel" <ppoyrazyilmazzz@gmail.com>',
+                to,
+                subject,
+                html
+            });
+            console.log(`📧 E-posta gönderildi: ${to} (ID: ${info.messageId})`);
+            return true;
+        } catch (error) {
+            console.error('❌ E-posta gönderme hatası:', error);
+            // Hata olsa bile devam et (kullanıcı kaydı engellenmesin)
+            return false;
+        }
     }
 
     public static async sendVerificationEmail(to: string, token: string) {
-        const link = `http://localhost:3000/auth/verify?token=${token}`;
-        await this.sendMail(to, "Hesap Doğrulama", `Lütfen hesabınızı doğrulamak için tıklayın: ${link}`);
+        const link = `${FRONTEND_URL}/auth/verify?token=${token}`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #1a365d;">🔐 Hesabınızı Doğrulayın</h2>
+                <p>Merhaba,</p>
+                <p>Hybrid Sentinel hesabınızı doğrulamak için aşağıdaki butona tıklayın:</p>
+                <a href="${link}" style="display: inline-block; background: #3182ce; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+                    Hesabımı Doğrula
+                </a>
+                <p style="color: #666; font-size: 14px;">Veya bu linki tarayıcınıza yapıştırın:</p>
+                <p style="color: #3182ce; word-break: break-all;">${link}</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+                <p style="color: #999; font-size: 12px;">Bu e-postayı siz istemediyseniz, lütfen dikkate almayın.</p>
+            </div>
+        `;
+        await this.sendMail(to, 'Hesabınızı Doğrulayın - Hybrid Sentinel', html);
     }
 
     public static async sendResetPasswordEmail(to: string, token: string) {
-        const link = `http://localhost:3000/auth/reset-password?token=${token}`;
-        await this.sendMail(to, "Şifre Sıfırlama", `Şifrenizi sıfırlama için tıklayın: ${link}`);
+        const link = `${FRONTEND_URL}/auth/reset-password?token=${token}`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #1a365d;">🔑 Şifrenizi Sıfırlayın</h2>
+                <p>Merhaba,</p>
+                <p>Şifrenizi sıfırlamak için aşağıdaki butona tıklayın:</p>
+                <a href="${link}" style="display: inline-block; background: #e53e3e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+                    Şifremi Sıfırla
+                </a>
+                <p style="color: #666; font-size: 14px;">Bu link 1 saat içinde geçerliliğini yitirecektir.</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+                <p style="color: #999; font-size: 12px;">Bu e-postayı siz istemediyseniz, lütfen dikkate almayın.</p>
+            </div>
+        `;
+        await this.sendMail(to, 'Şifre Sıfırlama - Hybrid Sentinel', html);
     }
 }

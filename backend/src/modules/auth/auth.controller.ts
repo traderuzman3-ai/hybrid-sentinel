@@ -39,7 +39,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                 lastName,
                 emailVerificationToken,
                 accountType: accountType || 'REAL',
-                isEmailVerified: false, // Explicitly set default
+                isEmailVerified: false, // Email doğrulama gerekli
                 // Otomatik cüzdan oluşturma
                 wallets: {
                     create: [
