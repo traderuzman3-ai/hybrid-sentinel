@@ -10,16 +10,19 @@ import { MarketAnalyticsService } from './analytics.service';
 export default async function marketRoutes(fastify: FastifyInstance) {
     const sentinel = MarketSentinel.getInstance();
 
-    fastify.get('/market/ws', { websocket: true }, (connection, req) => {
-        if (!connection || !connection.socket) {
-            console.error('Connection or socket is undefined!');
+    fastify.get('/market/ws', { websocket: true }, (connection: any, req) => {
+        if (!connection) {
+            console.error('Connection is undefined!');
             return;
         }
+
+        // connection is either the socket itself or a stream containing the socket
+        const socket = connection.socket || connection;
 
         console.log('Client connected to Market WebSocket');
 
         const socketId = Math.random().toString(36).substring(7);
-        (connection.socket as any).id = socketId;
+        (socket as any).id = socketId;
 
         // Private Stream Simulation (Faz 5.7)
         const userId = (req as any).user?.id;
@@ -27,8 +30,7 @@ export default async function marketRoutes(fastify: FastifyInstance) {
             console.log(`[WS] Private stream joined for user: ${userId}`);
         }
 
-        // @ts-ignore
-        connection.socket.on('message', (message: any) => {
+        socket.on('message', (message: any) => {
             // ...
         });
 
@@ -41,7 +43,7 @@ export default async function marketRoutes(fastify: FastifyInstance) {
                 tape: TapeService.getTapeData(p.symbol, p.price)
             }));
 
-            (connection as any).socket.send(JSON.stringify({
+            socket.send(JSON.stringify({
                 type: 'MARKET_UPDATE',
                 data: payload,
                 intelligence: {
@@ -54,7 +56,7 @@ export default async function marketRoutes(fastify: FastifyInstance) {
             }));
         }, 2000); // 2 saniyede bir broadcast
 
-        (connection as any).socket.on('close', () => {
+        socket.on('close', () => {
             clearInterval(interval);
             console.log('Client disconnected from Market WebSocket');
         });
