@@ -50,7 +50,8 @@ export default function TradePage() {
 
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3001/trade/order', {
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+            const response = await fetch(`${baseUrl}/trade/order`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -101,25 +102,25 @@ export default function TradePage() {
                     <h1 style={{ fontSize: '24px', margin: 0 }}>{symbol?.toString().replace('-USD', '').replace('.IS', '')}</h1>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
                         <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--primary)' }}>
-                            {marketData.price.toLocaleString()} {symbol?.toString().includes('.IS') ? '₺' : '$'}
+                            {marketData?.price?.toLocaleString()} {symbol?.toString().includes('.IS') ? '₺' : '$'}
                         </span>
-                        <span style={{ color: marketData.changePercent >= 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '14px' }}>
-                            {marketData.changePercent >= 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%
+                        <span style={{ color: (marketData?.changePercent || 0) >= 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '14px' }}>
+                            {marketData?.changePercent >= 0 ? '+' : ''}{marketData?.changePercent?.toFixed(2)}%
                         </span>
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: '32px' }}>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>24s Yüksek</div>
-                        <div style={{ fontWeight: '500' }}>{marketData.high.toLocaleString()}</div>
+                        <div style={{ fontWeight: '500' }}>{marketData?.high?.toLocaleString()}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>24s Düşük</div>
-                        <div style={{ fontWeight: '500' }}>{marketData.low.toLocaleString()}</div>
+                        <div style={{ fontWeight: '500' }}>{marketData?.low?.toLocaleString()}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>24s Hacim</div>
-                        <div style={{ fontWeight: '500' }}>{marketData.volume.toLocaleString()}</div>
+                        <div style={{ fontWeight: '500' }}>{marketData?.volume?.toLocaleString()}</div>
                     </div>
                 </div>
             </div>
@@ -146,20 +147,20 @@ export default function TradePage() {
                                 {marketData.orderBook.asks.slice(0, 10).reverse().map((ask: any, idx: number) => (
                                     <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', height: '18px' }}>
                                         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(255, 71, 87, 0.08)', width: `${(ask.amount / 100) * 100}%` }}></div>
-                                        <span style={{ color: 'var(--danger)', zIndex: 1 }}>{ask.price.toLocaleString()}</span>
-                                        <span style={{ color: 'var(--text-secondary)', zIndex: 1 }}>{ask.amount.toFixed(3)}</span>
+                                        <span style={{ color: 'var(--danger)', zIndex: 1 }}>{ask.price?.toLocaleString()}</span>
+                                        <span style={{ color: 'var(--text-secondary)', zIndex: 1 }}>{ask.amount?.toFixed(3)}</span>
                                     </div>
                                 ))}
                             </div>
                             <div style={{ textAlign: 'center', padding: '10px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', fontWeight: 'bold', fontSize: '16px', margin: '4px 0' }}>
-                                {marketData.price.toLocaleString()}
+                                {marketData?.price?.toLocaleString()}
                             </div>
                             <div>
-                                {marketData.orderBook.bids.slice(0, 10).map((bid: any, idx: number) => (
+                                {marketData?.orderBook?.bids?.slice(0, 10).map((bid: any, idx: number) => (
                                     <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', height: '18px' }}>
                                         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(46, 213, 115, 0.08)', width: `${(bid.amount / 100) * 100}%` }}></div>
-                                        <span style={{ color: 'var(--success)', zIndex: 1 }}>{bid.price.toLocaleString()}</span>
-                                        <span style={{ color: 'var(--text-secondary)', zIndex: 1 }}>{bid.amount.toFixed(3)}</span>
+                                        <span style={{ color: 'var(--success)', zIndex: 1 }}>{bid.price?.toLocaleString()}</span>
+                                        <span style={{ color: 'var(--text-secondary)', zIndex: 1 }}>{bid.amount?.toFixed(3)}</span>
                                     </div>
                                 ))}
                             </div>
