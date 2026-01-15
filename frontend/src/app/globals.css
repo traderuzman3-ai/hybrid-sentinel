@@ -1,145 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --secondary: #8b5cf6;
+  /* Corporate Light Theme Palette - Aurum Corporate */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-header: #ffffff;
+
+  --text-primary: #0f172a;
+  /* Slate 900 */
+  --text-secondary: #64748b;
+  /* Slate 500 */
+  --text-accent: #d97706;
+  /* Amber 600 - Gold */
+
+  --primary-navy: #0f172a;
+  --primary-blue: #2563eb;
+
+  --border-color: #e2e8f0;
+
   --success: #10b981;
   --danger: #ef4444;
-  --warning: #f59e0b;
-  --dark: #0f172a;
-  --dark-light: #1e293b;
-  --text: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --radius: 12px;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-}
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  --radius: 0.5rem;
+
+  --font-family-base: 'Inter', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font-family: var(--font-family-base);
 }
 
-/* Smooth animations */
-* {
-  transition: all 0.2s ease;
-}
-
-/* MOBILE OPTIMIZATIONS (Faz 7.1) */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 16px !important;
-  }
-
-  .desktop-only {
-    display: none !important;
-  }
-
-  .mobile-nav {
-    display: flex !important;
-  }
-
-  .card {
-    padding: 16px !important;
-  }
-
-  /* Dashboard grid optimizations */
-  .dashboard-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Trade page layout */
-  .trade-layout {
-    grid-template-columns: 1fr !important;
-  }
-
-  .trade-order-panel {
-    order: -1;
-    /* Emir paneli üste gelsin mobil için */
-  }
-
-  .glass-card {
-    border-radius: 12px !important;
-    margin-bottom: 12px;
-  }
-}
-
-/* Premium button */
-.btn {
-  padding: 12px 24px;
+/* Tactile Button Style - "Tırt Tırt" Hissi */
+.btn-tactile {
+  background: linear-gradient(to bottom, #ffffff, #f1f5f9);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
   border-radius: var(--radius);
-  border: none;
   font-weight: 600;
+  box-shadow: 0 3px 0 #cbd5e1, 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
   cursor: pointer;
-  font-size: 16px;
-  box-shadow: var(--shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+.btn-tactile:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #cbd5e1, inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-tactile.primary {
+  background: linear-gradient(to bottom, #0f172a, #1e293b);
   color: white;
+  border-color: #020617;
+  box-shadow: 0 3px 0 #020617, 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+.btn-tactile.primary:active {
+  box-shadow: 0 0 0 #020617, inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.btn-secondary {
-  background: var(--dark-light);
-  color: var(--text);
-  border: 1px solid var(--border);
+.btn-tactile.success {
+  background: linear-gradient(to bottom, #10b981, #059669);
+  color: white;
+  border-color: #047857;
+  box-shadow: 0 3px 0 #047857, 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.btn-secondary:hover {
-  background: var(--border);
+.btn-tactile.success:active {
+  box-shadow: 0 0 0 #047857;
 }
 
-/* Card */
-.card {
-  background: var(--dark-light);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+.btn-tactile.danger {
+  background: linear-gradient(to bottom, #ef4444, #dc2626);
+  color: white;
+  border-color: #b91c1c;
+  box-shadow: 0 3px 0 #b91c1c, 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Input */
-.input {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--dark);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-size: 16px;
+.btn-tactile.danger:active {
+  box-shadow: 0 0 0 #b91c1c;
 }
 
-.input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+/* Card Style - Matte Finish */
+.card-matte {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
 }
 
-/* Container */
-.container {
-  max-width: 1400px;
+.card-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--primary-navy);
+}
+
+/* Layout Utilities */
+.container-custom {
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 1rem;
 }
 
-/* Glassmorphism effect */
-.glass {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.sidebar-nav-item:hover {
+  background: #f1f5f9;
+  color: var(--primary-navy);
+}
+
+.sidebar-nav-item.active {
+  background: #eff6ff;
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Ticker Animation */
+@keyframes ticker {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
 }

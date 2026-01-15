@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import "./globals.css";
 import { UserProvider } from '../context/UserContext';
-import Navbar from '../components/Navbar';
-import MobileNav from '../components/MobileNav';
+import BrandHeader from '../components/BrandHeader';
+import InfoSidebar from '../components/InfoSidebar';
+import AssetTicker from '../components/AssetTicker';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
 export const metadata: Metadata = {
     title: 'Hybrid Sentinel - Professional Trading',
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-    themeColor: '#4cc9f0',
+    themeColor: '#ffffff',
     width: 'device-width',
     initialScale: 1,
     maximumScale: 1,
@@ -28,13 +30,21 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="tr">
-            <body className={inter.className}>
+            <body className={`${inter.variable} ${jetbrains.variable} font-sans antialiased text-text-primary bg-bg-primary`}>
                 <UserProvider>
-                    <Navbar />
-                    <main style={{ paddingTop: '80px' }}>
-                        {children}
-                    </main>
-                    <MobileNav />
+                    <div className="min-h-screen flex flex-col">
+                        <BrandHeader />
+
+                        <div className="flex flex-1 overflow-hidden h-[calc(100vh-80px)]">
+                            <InfoSidebar />
+
+                            <main className="flex-1 overflow-y-auto w-full relative">
+                                {children}
+                            </main>
+
+                            <AssetTicker />
+                        </div>
+                    </div>
                 </UserProvider>
                 <script dangerouslySetInnerHTML={{
                     __html: `
