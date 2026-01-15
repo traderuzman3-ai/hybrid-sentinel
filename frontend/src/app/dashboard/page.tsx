@@ -1,10 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
-import NewsTicker from '@/components/NewsTicker';
-import SentimentWidget from '@/components/SentimentWidget';
-import MarketScanner from '@/components/MarketScanner';
-import MarketWatchlist from '@/components/MarketWatchlist';
-import MarketHeatmap from '@/components/MarketHeatmap';
+// import NewsTicker from '@/components/NewsTicker';
+// import SentimentWidget from '@/components/SentimentWidget';
+// import MarketScanner from '@/components/MarketScanner';
+// import MarketWatchlist from '@/components/MarketWatchlist';
+// import MarketHeatmap from '@/components/MarketHeatmap';
 import PortfolioAnalytics from '@/components/PortfolioAnalytics';
 import PortfolioDistribution from '@/components/PortfolioDistribution';
 import WatchlistManager from '@/components/WatchlistManager';
@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
     return (
         <div className="container" style={{ paddingBottom: '60px' }}>
-            {intel && <NewsTicker news={intel.news} />}
+            {/* {intel && <NewsTicker news={intel.news} />} */}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '24px', marginBottom: '32px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -37,13 +37,13 @@ export default function DashboardPage() {
                         </p>
                     </div>
                     <WatchlistManager /> {/* Replaced MarketWatchlist with WatchlistManager */}
-                    {intel && <MarketHeatmap data={intel.heatmap} />}
+                    {/* {intel && <MarketHeatmap data={intel.heatmap} />} */}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <PortfolioAnalytics />
-                    {intel && <SentimentWidget sentiment={intel.sentiment} />}
-                    {intel && <MarketScanner scanData={intel.scan} />}
+                    {/* {intel && <SentimentWidget sentiment={intel.sentiment} />} */}
+                    {/* {intel && <MarketScanner scanData={intel.scan} />} */}
                 </div>
             </div>
         </div>
