@@ -11,10 +11,14 @@ export default async function marketRoutes(fastify: FastifyInstance) {
     const sentinel = MarketSentinel.getInstance();
 
     fastify.get('/market/ws', { websocket: true }, (connection, req) => {
+        if (!connection || !connection.socket) {
+            console.error('Connection or socket is undefined!');
+            return;
+        }
+
         console.log('Client connected to Market WebSocket');
 
         const socketId = Math.random().toString(36).substring(7);
-        // @ts-ignore
         (connection.socket as any).id = socketId;
 
         // Private Stream Simulation (Faz 5.7)

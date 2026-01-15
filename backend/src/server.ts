@@ -22,10 +22,11 @@ async function buildServer() {
         logger: true
     });
 
-    // CORS
+    // CORS - Allow all origins to fix "Failed to fetch" on different deployments
     await fastify.register(cors, {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-        credentials: true
+        origin: true,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     });
 
     // Rate Limiting
