@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 // import { MarketChart } from '@/components/MarketChart';
 // import { useUser } from '@/context/UserContext';
 
-import TimeAndSales from '@/components/TimeAndSales';
+import TimeAndSales from '../../../components/TimeAndSales';
 
 export default function TradePage() {
     const params = useParams();

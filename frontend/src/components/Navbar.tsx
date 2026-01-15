@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useUser } from '@/context/UserContext';
+import { useUser } from '../context/UserContext';
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {

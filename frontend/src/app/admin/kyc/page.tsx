@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import AdminGuard from '@/components/AdminGuard';
+import AdminGuard from '../../../components/AdminGuard';
 
 export default function AdminKycPage() {
     const [kycList, setKycList] = useState<any[]>([]);
