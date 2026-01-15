@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { MarketChart } from '@/components/MarketChart';
-import { useUser } from '@/context/UserContext';
+// import { MarketChart } from '@/components/MarketChart';
+// import { useUser } from '@/context/UserContext';
 
 import TimeAndSales from '@/components/TimeAndSales';
 
 export default function TradePage() {
     const params = useParams();
     const symbol = params?.symbol || 'BTCUSDT';
-    const { balance, refreshUserData } = useUser();
+    // const { balance, refreshUserData } = useUser();
+    const balance = 10000; // Mock balance
     const [marketData, setMarketData] = useState<any>(null);
     const [chartData, setChartData] = useState<{ time: string; value: number }[]>([]);
     const [tape, setTape] = useState<any[]>([]);
@@ -80,7 +81,7 @@ export default function TradePage() {
                 // Tape'e ekle (simülasyon)
                 // setTrades(prev => [newTrade, ...prev].slice(0, 20));
                 alert(`Order placed successfully! Order ID: ${order.id}`);
-                refreshUserData(); // Refresh user balance and positions
+                // refreshUserData(); // Refresh user balance and positions
             } else {
                 alert(`Order failed: ${data.message || 'Unknown error'}`);
             }
@@ -133,8 +134,8 @@ export default function TradePage() {
                         <span style={{ fontWeight: '600', fontSize: '14px' }}>Fiyat Grafiği (Canlı)</span>
                         <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Source: {marketData.source}</span>
                     </div>
-                    <div style={{ height: 'calc(100% - 50px)' }}>
-                        <MarketChart data={chartData} />
+                    <div style={{ height: 'calc(100% - 50px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                        📈 Chart Loading...
                     </div>
                 </div>
 
