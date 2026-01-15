@@ -8,7 +8,8 @@ import { useUser } from '@/context/UserContext';
 import TimeAndSales from '@/components/TimeAndSales';
 
 export default function TradePage() {
-    const { symbol } = useParams();
+    const params = useParams();
+    const symbol = params?.symbol || 'BTCUSDT';
     const { balance, refreshUserData } = useUser();
     const [marketData, setMarketData] = useState<any>(null);
     const [chartData, setChartData] = useState<{ time: string; value: number }[]>([]);
@@ -19,7 +20,9 @@ export default function TradePage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:3001/market/ws`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const wsUrl = baseUrl.replace('https://', 'wss://').replace('http://', 'ws://');
+        const ws = new WebSocket(`${wsUrl}/market/ws`);
 
         ws.onmessage = (event) => {
             const payload = JSON.parse(event.data);
@@ -95,10 +98,10 @@ export default function TradePage() {
             {/* HEADER BİLGİSİ */}
             <div className="glass" style={{ padding: '16px 24px', borderRadius: 'var(--radius)', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <h1 style={{ fontSize: '24px', margin: 0 }}>{symbol.toString().replace('-USD', '').replace('.IS', '')}</h1>
+                    <h1 style={{ fontSize: '24px', margin: 0 }}>{symbol?.toString().replace('-USD', '').replace('.IS', '')}</h1>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
                         <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--primary)' }}>
-                            {marketData.price.toLocaleString()} {symbol.toString().includes('.IS') ? '₺' : '$'}
+                            {marketData.price.toLocaleString()} {symbol?.toString().includes('.IS') ? '₺' : '$'}
                         </span>
                         <span style={{ color: marketData.changePercent >= 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '14px' }}>
                             {marketData.changePercent >= 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%
