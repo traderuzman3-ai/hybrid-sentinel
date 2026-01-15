@@ -26,9 +26,10 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
         // Şifre hash'leme
         const passwordHash = await argon2.hash(password);
 
-        // Verification token oluştur
+        // Verification token oluştur (sadece gerçek hesaplar için)
         const crypto = require('crypto');
-        const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+        const isDemo = accountType === 'DEMO';
+        const emailVerificationToken = isDemo ? null : crypto.randomBytes(32).toString('hex');
 
         // Kullanıcı oluştur
         const user = await prisma.user.create({
@@ -39,18 +40,18 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                 lastName,
                 emailVerificationToken,
                 accountType: accountType || 'REAL',
-                isEmailVerified: false, // Email doğrulama gerekli
+                isEmailVerified: isDemo, // Demo hesaplar otomatik doğrulanmış
                 // Otomatik cüzdan oluşturma
                 wallets: {
                     create: [
                         {
                             currency: 'TRY',
-                            balance: accountType === 'DEMO' ? 100000 : 0, // Demo hesaplara 100.000 TL bakiye
+                            balance: isDemo ? 100000 : 0, // Demo hesaplara 100.000 TL bakiye
                             frozen: 0
                         },
                         {
                             currency: 'USD',
-                            balance: accountType === 'DEMO' ? 10000 : 0, // Demo hesaplara 10.000 USD bakiye
+                            balance: isDemo ? 10000 : 0, // Demo hesaplara 10.000 USD bakiye
                             frozen: 0
                         }
                     ]
@@ -68,9 +69,13 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
             }
         });
 
-        // Email gönder
-        const { MailService } = require('./mail.service');
-        await MailService.sendVerificationEmail(email, emailVerificationToken);
+        // Sadece gerçek hesaplar için email gönder
+        if (!isDemo) {
+            const { MailService } = require('./mail.service');
+            await MailService.sendVerificationEmail(email, emailVerificationToken);
+        } else {
+            console.log(`✅ Demo hesap oluşturuldu: ${email} - email doğrulaması atlandı`);
+        }
 
         // Audit log
         await prisma.auditLog.create({
