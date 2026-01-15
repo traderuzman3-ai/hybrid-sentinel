@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import "./globals.css";
 import { UserProvider } from '../context/UserContext';
+import { MarketProvider } from '../context/MarketContext';
 import BrandHeader from '../components/BrandHeader';
 import InfoSidebar from '../components/InfoSidebar';
 import AssetTicker from '../components/AssetTicker';
@@ -32,19 +33,9 @@ export default function RootLayout({
         <html lang="tr">
             <body className={`${inter.variable} ${jetbrains.variable} font-sans antialiased text-text-primary bg-bg-primary`}>
                 <UserProvider>
-                    <div className="min-h-screen flex flex-col">
-                        <BrandHeader />
-
-                        <div className="flex flex-1 overflow-hidden h-[calc(100vh-80px)]">
-                            <InfoSidebar />
-
-                            <main className="flex-1 overflow-y-auto w-full relative">
-                                {children}
-                            </main>
-
-                            <AssetTicker />
-                        </div>
-                    </div>
+                    <MarketProvider>
+                        {children}
+                    </MarketProvider>
                 </UserProvider>
                 <script dangerouslySetInnerHTML={{
                     __html: `

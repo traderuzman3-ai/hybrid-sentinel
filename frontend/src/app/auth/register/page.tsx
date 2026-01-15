@@ -1,11 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function RegisterPage() {
+function RegisterForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const type = searchParams.get('type') || 'real';
+    const isDemo = type === 'demo';
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -46,7 +50,9 @@ export default function RegisterPage() {
                     password: formData.password,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    phone: formData.phone
+                    phone: formData.phone,
+                    // Backend supports this eventually, for now just passing context if needed
+                    accountType: isDemo ? 'DEMO' : 'REAL'
                 })
             });
 
@@ -68,9 +74,11 @@ export default function RegisterPage() {
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
             <div className="card" style={{ maxWidth: '500px', width: '100%' }}>
-                <h1 style={{ fontSize: '32px', marginBottom: '8px', textAlign: 'center' }}>Kayıt Ol</h1>
+                <h1 style={{ fontSize: '32px', marginBottom: '8px', textAlign: 'center' }}>
+                    {isDemo ? 'Demo Hesap Oluştur' : 'Gerçek Hesap Oluştur'}
+                </h1>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
-                    Yeni hesap oluşturun
+                    {isDemo ? 'Sanal bakiye ile güvenle işlem yapın' : 'Piyasalara anında erişim sağlayın'}
                 </p>
 
                 {error && (
@@ -181,5 +189,13 @@ export default function RegisterPage() {
                 </form>
             </div>
         </div>
+    );
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={<div>Yükleniyor...</div>}>
+            <RegisterForm />
+        </Suspense>
     );
 }

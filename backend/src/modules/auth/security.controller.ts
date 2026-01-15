@@ -32,3 +32,20 @@ export async function verifyEmail(req: FastifyRequest, reply: FastifyReply) {
 
     return { success: true, message: 'Hesabınız başarıyla doğrulandı.' };
 }
+
+export async function resetPassword(req: FastifyRequest, reply: FastifyReply) {
+    const { token, newPassword } = req.body as { token: string; newPassword: string };
+    const user = await prisma.user.findFirst({ where: { resetPasswordToken: token } });
+
+    if (!user) return reply.status(400).send({ error: 'Geçersiz veya süresi dolmuş token.' });
+
+    const argon2 = require('argon2');
+    const passwordHash = await argon2.hash(newPassword);
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash, resetPasswordToken: null }
+    });
+
+    return { success: true, message: 'Şifreniz başarıyla güncellendi.' };
+}

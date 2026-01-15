@@ -44,6 +44,11 @@ export class MatchingEngine {
      * Emir yerleştirme ve eşleşme mantığı.
      */
     public async placeOrder(orderData: any) {
+        if (orderData.type === 'MARKET') {
+            await this.matchMarketOrder(orderData);
+        }
+    }
+
     private async matchMarketOrder(order: Order) {
         // Market emirleri için simüle edilmiş anlık dolum
         await prisma.order.update({
@@ -56,12 +61,12 @@ export class MatchingEngine {
     }
 
     private async tryMatch(symbol: string) {
-        const book = this.orderBook.get(symbol);
+        const book = this.orderBooks.get(symbol);
         if (!book) return;
 
-        while (book.buy.length > 0 && book.sell.length > 0) {
-            const bestBuy = book.buy[0];
-            const bestSell = book.sell[0];
+        while (book.bids.length > 0 && book.asks.length > 0) {
+            const bestBuy = book.bids[0];
+            const bestSell = book.asks[0];
 
             if ((bestBuy.price || 0) >= (bestSell.price || 0)) {
                 // EŞLEŞME GERÇEKLEŞTİ
@@ -74,8 +79,8 @@ export class MatchingEngine {
                 bestBuy.quantity -= matchQuantity;
                 bestSell.quantity -= matchQuantity;
 
-                if (bestBuy.quantity === 0) book.buy.shift();
-                if (bestSell.quantity === 0) book.sell.shift();
+                if (bestBuy.quantity === 0) book.bids.shift();
+                if (bestSell.quantity === 0) book.asks.shift();
             } else {
                 break;
             }

@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { register, login, refreshToken, getProfile } from './auth.controller';
 import { setupTwoFA, enableTwoFA } from './twofa.controller';
-import { forgotPassword, verifyEmail } from './security.controller';
+import { forgotPassword, verifyEmail, resetPassword } from './security.controller';
 
 export default async function authRoutes(fastify: FastifyInstance) {
     // Public routes
@@ -25,5 +25,6 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
     // Security Routes
     fastify.post('/auth/forgot-password', forgotPassword);
+    fastify.post('/auth/reset-password', resetPassword);
     fastify.get('/auth/verify-email', verifyEmail);
 }

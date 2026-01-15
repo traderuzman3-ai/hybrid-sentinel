@@ -1,138 +1,89 @@
 'use client';
 
-import AccountSwitch from '../components/AccountSwitch';
-import { MarketChart } from '../components/MarketChart';
-import { useState } from 'react';
+import Link from 'next/link';
+import { AreaChart, ShieldCheck, User, ArrowRight } from 'lucide-react';
 
-// Mock Data for ASELS
-const MOCK_DATA = [
-    { time: '2023-12-22', open: 62.50, high: 63.80, low: 62.10, close: 63.20 },
-    { time: '2023-12-23', open: 63.20, high: 64.50, low: 63.00, close: 64.10 },
-    { time: '2023-12-24', open: 64.10, high: 65.20, low: 63.80, close: 64.90 },
-    { time: '2023-12-25', open: 64.90, high: 66.00, low: 64.50, close: 65.50 },
-    { time: '2023-12-26', open: 65.50, high: 65.80, low: 64.20, close: 64.80 },
-    { time: '2023-12-27', open: 64.80, high: 66.50, low: 64.80, close: 66.20 },
-    { time: '2023-12-28', open: 66.20, high: 68.00, low: 66.00, close: 67.50 },
-    { time: '2023-12-29', open: 67.50, high: 69.20, low: 67.20, close: 68.90 },
-];
-
-export default function Home() {
+export default function LandingPage() {
     return (
-        <div className="flex flex-col h-full bg-bg-app p-2 gap-2">
-
-            {/* Top Control Bar: Reduced height, high density */}
-            <div className="flex items-center justify-between bg-bg-card border border-border-subtle rounded-md px-3 py-2 shadow-sm h-12 shrink-0">
-                <div className="flex items-center gap-4">
-                    <AccountSwitch />
-                    <div className="h-4 w-px bg-border-subtle"></div>
-                    <div className="flex items-baseline gap-2">
-                        <h1 className="text-lg font-bold text-primary-navy tracking-tight">ASELS</h1>
-                        <span className="text-xs text-text-secondary font-medium">ASELSAN ELEKTRONİK</span>
+        <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+            {/* Header */}
+            <header className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto w-full">
+                <div className="flex items-center gap-2">
+                    {/* Logo */}
+                    <div className="text-2xl font-bold tracking-tighter text-slate-900">
+                        //r
                     </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <div className="text-right">
-                        <div className="text-xs text-text-muted">Son Fiyat</div>
-                        <div className="text-lg font-bold font-mono-data text-success tracking-tight">68.90 ₺</div>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-xs text-text-muted">Değişim</div>
-                        <div className="text-sm font-bold font-mono-data text-success flex items-center gap-1">
-                            ▲ %2.10
-                        </div>
-                    </div>
-                    <div className="text-right hidden sm:block">
-                        <div className="text-xs text-text-muted">Hacim</div>
-                        <div className="text-sm font-medium font-mono-data text-text-primary">452.1M</div>
+                <nav className="hidden md:flex gap-8 text-[15px] font-medium text-slate-600">
+                    <a href="#" className="hover:text-slate-900 transition-colors flex items-center gap-2">
+                        <span className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center text-[8px]">●</span> Piyasalar
+                    </a>
+                    <a href="#" className="hover:text-slate-900 transition-colors flex items-center gap-2">
+                        <span className="text-slate-400">📈</span> Analizler
+                    </a>
+                    <a href="#" className="hover:text-slate-900 transition-colors flex items-center gap-2">
+                        <User size={18} /> Danışman
+                    </a>
+                </nav>
+
+                <div className="hidden md:block w-8"></div>
+            </header>
+
+            {/* Hero Section */}
+            <main className="flex-1 flex flex-col md:flex-row items-center justify-center px-6 md:px-20 max-w-7xl mx-auto w-full gap-12 -mt-10">
+                {/* Left Side: Text */}
+                <div className="flex-1 text-left">
+                    <h1 className="text-6xl md:text-[5.5rem] font-bold text-slate-900 tracking-tight leading-[1] mb-8">
+                        Kontrol sende.<br />
+                        Piyasa senin<br />
+                        hızında.
+                    </h1>
+
+                    <div className="flex flex-wrap gap-8 text-slate-500 font-medium text-base">
+                        <span className="flex items-center gap-2">
+                            <ActivityIcon /> Canlı Borsa
+                        </span>
+                        <span className="flex items-center gap-2">
+                            <ShieldCheck size={18} /> Güvenli Al-Sat
+                        </span>
+                        <span className="flex items-center gap-2">
+                            <SettingsIcon /> Profesyonel Araçlar
+                        </span>
                     </div>
                 </div>
-            </div>
 
-            {/* Main Terminal Grid */}
-            <div className="flex-1 grid grid-cols-12 gap-2 min-h-0">
-
-                {/* Center Panel: Chart (9 Columns) */}
-                <div className="col-span-12 lg:col-span-9 flex flex-col gap-2 min-h-0">
-                    <div className="card-matte flex-1 flex flex-col p-0 overflow-hidden min-h-0 relative">
-                        {/* Chart Toolbar Overlay */}
-                        <div className="absolute top-2 left-2 z-10 flex gap-1">
-                            {['1D', '1W', '1M', '3M', '1Y'].map(t => (
-                                <button key={t} className="px-2 py-0.5 text-[10px] font-medium bg-white/80 border border-gray-200 rounded hover:bg-gray-50 text-text-secondary">
-                                    {t}
+                {/* Right Side: Action Card */}
+                <div className="flex-1 flex justify-end w-full max-w-md">
+                    <div className="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200/50 w-full max-w-[400px]">
+                        <div className="flex flex-col gap-4">
+                            <Link href="/auth/register?type=real" className="w-full">
+                                <button className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-medium text-lg py-4 px-6 rounded-full transition-all shadow-lg shadow-emerald-200/50 active:scale-[0.98]">
+                                    Gerçek Hesap
                                 </button>
-                            ))}
-                        </div>
+                            </Link>
 
-                        <div className="flex items-center justify-center h-full bg-white relative">
-                            <MarketChart
-                                data={MOCK_DATA}
-                                colors={{
-                                    upColor: '#10b981',
-                                    downColor: '#ef4444',
-                                    backgroundColor: 'transparent',
-                                }}
-                            />
+                            <Link href="/auth/register?type=demo" className="w-full">
+                                <button className="w-full bg-white border border-[#10b981] text-[#10b981] hover:bg-emerald-50 font-medium text-lg py-4 px-6 rounded-full transition-colors active:scale-[0.98]">
+                                    Demo Hesap
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
-
-                {/* Right Panel: Order Book & Entry (3 Columns) */}
-                <div className="col-span-12 lg:col-span-3 flex flex-col gap-2 min-h-0">
-
-                    {/* Order Entry Panel */}
-                    <div className="card-matte p-3 shrink-0">
-                        <div className="text-xs font-bold text-primary-navy uppercase tracking-wider mb-2 border-b border-border-subtle pb-1">Hızlı Emir</div>
-
-                        <div className="grid grid-cols-2 gap-2 mb-3">
-                            <div className="bg-gray-50 p-2 rounded border border-gray-100 text-center cursor-pointer hover:border-blue-200 transition-colors">
-                                <div className="text-[10px] text-text-secondary">Alış</div>
-                                <div className="font-mono-data font-bold text-success">68.90</div>
-                            </div>
-                            <div className="bg-gray-50 p-2 rounded border border-gray-100 text-center cursor-pointer hover:border-red-200 transition-colors">
-                                <div className="text-[10px] text-text-secondary">Satış</div>
-                                <div className="font-mono-data font-bold text-danger">68.95</div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                            <button className="btn-tactile success w-full justify-center py-2 text-sm shadow-sm">
-                                AL
-                            </button>
-                            <button className="btn-tactile danger w-full justify-center py-2 text-sm shadow-sm">
-                                SAT
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Account Summary - Compact */}
-                    <div className="card-matte p-3 flex-1 flex flex-col">
-                        <div className="text-xs font-bold text-primary-navy uppercase tracking-wider mb-3 border-b border-border-subtle pb-1">Portföy</div>
-
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-baseline">
-                                <span className="text-xs text-text-secondary">Bakiye</span>
-                                <span className="font-bold font-mono-data text-primary-navy">100.000 ₺</span>
-                            </div>
-                            <div className="flex justify-between items-baseline">
-                                <span className="text-xs text-text-secondary">Müsait</span>
-                                <span className="font-bold font-mono-data text-success">56.250 ₺</span>
-                            </div>
-                            <div className="flex justify-between items-baseline">
-                                <span className="text-xs text-text-secondary">Risk</span>
-                                <span className="font-bold font-mono-data text-text-primary">%45</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-auto pt-3 border-t border-border-subtle">
-                            <div className="flex items-center gap-2 text-[10px] text-text-secondary">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                Piyasa açık
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </main>
         </div>
     );
+}
+
+function ActivityIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+    )
+}
+
+function SettingsIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.73l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+    )
 }

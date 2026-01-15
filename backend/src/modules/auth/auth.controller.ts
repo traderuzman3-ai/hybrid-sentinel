@@ -22,6 +22,10 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
         // Şifre hash'leme
         const passwordHash = await argon2.hash(password);
 
+        // Verification token oluştur
+        const crypto = require('crypto');
+        const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
         // Kullanıcı oluştur
         const user = await prisma.user.create({
             data: {
@@ -29,7 +33,8 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                 passwordHash,
                 firstName,
                 lastName,
-                phone
+                phone,
+                emailVerificationToken
             },
             select: {
                 id: true,
@@ -42,6 +47,10 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
             }
         });
 
+        // Email gönder
+        const { MailService } = require('./mail.service');
+        await MailService.sendVerificationEmail(email, emailVerificationToken);
+
         // Audit log
         await prisma.auditLog.create({
             data: {
@@ -53,8 +62,9 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
             }
         });
 
-        return reply.status(201).send({ user });
+        return reply.status(201).send({ user, message: 'Kayıt başarılı. Lütfen e-postanızı doğrulayın.' });
     } catch (error) {
+        console.error('REGISTER ERROR:', error);
         request.log.error(error);
         return reply.status(500).send({ error: 'Kayıt sırasında hata oluştu' });
     }
@@ -75,8 +85,8 @@ export async function login(request: FastifyRequest, reply: FastifyReply) {
         }
 
         // Hesap aktif mi?
-        if (!user.isActive) {
-            return reply.status(403).send({ error: 'Hesabınız devre dışı bırakılmış' });
+        if (!user.isEmailVerified) {
+            return reply.status(403).send({ error: 'Lütfen önce e-posta adresinizi doğrulayın.' });
         }
 
         // Şifre kontrolü
