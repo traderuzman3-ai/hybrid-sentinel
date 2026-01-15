@@ -47,8 +47,14 @@ export default function Home() {
                                  Using MarketChart but styling needs to be passed or updated for Light Mode 
                              */}
                             <div className="absolute inset-0 flex items-center justify-center text-text-secondary">
-                                {/* Placeholder for now to ensure visual structure first */}
-                                <MarketChart data={MOCK_DATA} color="#10b981" />
+                                <MarketChart
+                                    data={MOCK_DATA}
+                                    colors={{
+                                        upColor: '#10b981',
+                                        downColor: '#ef4444',
+                                        backgroundColor: 'transparent',
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>

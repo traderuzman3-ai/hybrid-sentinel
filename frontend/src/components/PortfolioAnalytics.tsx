@@ -6,29 +6,24 @@ export default function PortfolioAnalytics() {
 
     // Simüle edilmiş portföy verileri (Emir motoru gelince gerçek olacak)
     const stats = [
-        { label: 'Hesap Değeri', value: `${balance.toLocaleString()} ₺`, color: 'var(--primary)' },
-        { label: 'Kullanılabilir', value: `${balance.toLocaleString()} ₺`, color: 'var(--text-main)' },
+        { label: 'Hesap Değeri', value: `${balance.toLocaleString()} ₺`, color: 'var(--primary-navy)' },
+        { label: 'Kullanılabilir', value: `${balance.toLocaleString()} ₺`, color: 'var(--success)' },
         { label: 'Açık Pozisyonlar', value: '0.00 ₺', color: 'var(--text-secondary)' },
         { label: 'Sağlık Skoru', value: '100%', color: 'var(--success)' }
     ];
 
     return (
-        <div className="card" style={{ padding: '24px' }}>
-            <h3 style={{ marginBottom: '20px' }}>Portföy Analitiği</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="card-matte">
+            <h3 className="card-header border-none p-0 mb-4 text-base">Portföy Analitiği</h3>
+            <div className="grid grid-cols-2 gap-4">
                 {stats.map((s, i) => (
-                    <div key={i} style={{
-                        padding: '16px',
-                        backgroundColor: 'rgba(255,255,255,0.03)',
-                        borderRadius: '12px',
-                        border: '1px solid rgba(255,255,255,0.03)'
-                    }}>
-                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>{s.label}</div>
-                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: s.color }}>{s.value}</div>
+                    <div key={i} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="text-xs text-text-secondary mb-1">{s.label}</div>
+                        <div className="text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
-            <div style={{ marginTop: '24px', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(76, 201, 240, 0.05)', fontSize: '12px', color: 'var(--primary)', textAlign: 'center' }}>
+            <div className="mt-6 p-3 rounded-md bg-blue-50 text-xs text-primary-blue text-center font-medium border border-blue-100">
                 📈 Portföyünüzün %100'ü nakitte. Fırsatları değerlendirmek için tarayıcıyı kullanın.
             </div>
         </div>
