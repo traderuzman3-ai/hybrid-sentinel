@@ -1,10 +1,19 @@
 {
     "version": 2,
-    "buildCommand": "npm run build",
-    "outputDirectory": ".next",
     "framework": "nextjs",
-    "installCommand": "npm install --legacy-peer-deps",
+    "buildCommand": "npm install --force && npm run build",
+    "outputDirectory": ".next",
+    "installCommand": "npm install --force",
     "regions": [
         "arn1"
-    ]
+    ],
+    "env": {
+        "NEXT_PUBLIC_API_URL": "https://hybrid-sentinel-production.up.railway.app"
+    },
+    "build": {
+        "env": {
+            "NEXT_TELEMETRY_DISABLED": "1",
+            "SKIP_ENV_VALIDATION": "1"
+        }
+    }
 }
