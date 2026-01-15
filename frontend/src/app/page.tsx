@@ -1,7 +1,7 @@
 'use client';
 
-import AccountSwitch from '@/components/AccountSwitch';
-import { MarketChart } from '@/components/MarketChart'; // Re-using existing chart for now
+import AccountSwitch from '../components/AccountSwitch';
+import { MarketChart } from '../components/MarketChart'; // Re-using existing chart for now
 import { useState } from 'react';
 
 // Mock Data for ASELS - we would fetch this in reality
