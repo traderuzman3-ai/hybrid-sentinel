@@ -27,25 +27,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
 
         try {
-            // Get Profile
-            const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+            // Get Profile (Use Proxy)
+            const profileRes = await fetch('/api/auth/profile', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (profileRes.ok) {
                 const profileData = await profileRes.json();
-                setUser(profileData);
+                setUser(profileData.user || profileData);
             } else {
                 logout();
                 return;
             }
 
-            // Get Balance
-            const ledgerRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ledger/history`, {
+            // Get Balance (Use Proxy)
+            const ledgerRes = await fetch('/api/ledger/wallets', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (ledgerRes.ok) {
                 const ledgerData = await ledgerRes.json();
-                setBalance(ledgerData.balance);
+                // TRY cüzdanını bul
+                const tryWallet = ledgerData.wallets?.find((w: any) => w.currency === 'TRY');
+                setBalance(tryWallet ? parseFloat(tryWallet.balance) : 0);
             }
         } catch (error) {
             console.error('User data refresh failed', error);

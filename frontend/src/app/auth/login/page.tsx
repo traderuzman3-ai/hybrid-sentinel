@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useUser } from '@/context/UserContext';
 
 export default function LoginPage() {
     const router = useRouter();
+    const { refreshUserData } = useUser();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -17,15 +19,27 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+            // Use local proxy /api/auth/login to avoid CORS and Env issues
+            const loginUrl = '/api/auth/login';
+            console.log('Sending login request to:', loginUrl);
+
+            // Timeout ekle (15 saniye - Railway DB yavaş olabilir)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+            const res = await fetch(loginUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId); // İşlem başarılı, zamanlayıcıyı iptal et
 
             const data = await res.json();
 
             if (!res.ok) {
+                // Backend'den gelen "error" alanı kod olabilir (örn: 'KYC_REQUIRED')
+                // Bu yüzden mesaj yerine onu fırlatıyoruz ki catch bloğunda yakalayalım
                 throw new Error(data.error || 'Giriş başarısız');
             }
 
@@ -34,10 +48,34 @@ export default function LoginPage() {
             localStorage.setItem('refreshToken', data.refreshToken);
             localStorage.setItem('user', JSON.stringify(data.user));
 
+            // Context'i güncelle (Non-blocking - Beklemeden devam et)
+            // Hata: await kullanınca bir şekilde takılıyor, bu yüzden fire-and-forget yapıyoruz
+            console.log('Triggering user data refresh (async)...');
+            refreshUserData().catch(e => console.error('Async refresh error:', e));
+
             // Dashboard'a yönlendir
-            router.push('/dashboard');
+            console.log('Redirecting to dashboard immediately...');
+            window.location.href = '/dashboard';
         } catch (err: any) {
-            setError(err.message);
+            console.error('Login error:', err);
+
+            if (err.name === 'AbortError') {
+                setError('Sunucu yanıt vermiyor (Zaman aşımı). Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.');
+                return;
+            }
+
+            // Backend'den gelen özel hata kodlarını yakala
+            if (err.message === 'KYC_REQUIRED') {
+                router.push('/kyc/upload'); // Direkt KYC yüklemeye at
+                return;
+            }
+            if (err.message === 'APPROVAL_PENDING') {
+                setError('Hesabınız onay sürecindedir. Lütfen mail kutunuzu takip edin.');
+                // İstersen burada özel bir "Bekleme Odası" sayfasına da atabilirsin
+                return;
+            }
+
+            setError(err.message || 'Giriş başarısız oldu.');
         } finally {
             setLoading(false);
         }

@@ -1,44 +1,60 @@
 'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, TrendingUp, Wallet, UserCircle, Bell } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import TradeSidebar from './TradeSidebar';
 
 export default function MobileNav() {
     const pathname = usePathname();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const NavItem = ({ href, icon: Icon, label, active, onClick }: any) => (
+        <Link
+            href={href}
+            onClick={onClick}
+            className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${active ? 'text-primary' : 'text-text-secondary'}`}
+        >
+            <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">{label}</span>
+        </Link>
+    );
 
     return (
-        <div className="mobile-nav" style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '65px',
-            backgroundColor: 'rgba(10, 14, 23, 0.95)',
-            backdropFilter: 'blur(10px)',
-            borderTop: '1px solid var(--border)',
-            display: 'none', // Sadece mobilde medya sorgusuyla açılacak
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            zIndex: 1000,
-            paddingBottom: 'env(safe-area-inset-bottom)'
-        }}>
-            <Link href="/dashboard" style={{ color: pathname === '/dashboard' ? 'var(--primary)' : 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <LayoutDashboard size={22} />
-                <span style={{ fontSize: '10px' }}>Panel</span>
-            </Link>
-            <Link href="/trade/BTC-USD" style={{ color: pathname?.includes('/trade') ? 'var(--primary)' : 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <TrendingUp size={22} />
-                <span style={{ fontSize: '10px' }}>Piyasa</span>
-            </Link>
-            <Link href="/wallet" style={{ color: pathname === '/wallet' ? 'var(--primary)' : 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <Wallet size={22} />
-                <span style={{ fontSize: '10px' }}>Cüzdan</span>
-            </Link>
-            <Link href="/kyc/status" style={{ color: pathname?.includes('/kyc') ? 'var(--primary)' : 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <UserCircle size={22} />
-                <span style={{ fontSize: '10px' }}>Profil</span>
-            </Link>
-        </div>
+        <>
+            {/* Bottom Tab Bar */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-border-subtle flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40 pb-safe">
+                <NavItem href="/dashboard" icon={LayoutDashboard} label="İşlem" active={pathname === '/dashboard'} />
+                <NavItem href="/portfolio" icon={Briefcase} label="Portföy" active={pathname === '/portfolio'} />
+
+                {/* Menu Button triggers Drawer */}
+                <button
+                    onClick={() => setIsMenuOpen(true)}
+                    className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isMenuOpen ? 'text-primary' : 'text-text-secondary'}`}
+                >
+                    <Menu size={20} strokeWidth={isMenuOpen ? 2.5 : 2} />
+                    <span className="text-[10px] font-medium">Menü</span>
+                </button>
+            </div>
+
+            {/* Mobile Menu Drawer */}
+            {isMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
+                    <div className="relative w-[300px] h-full bg-white animate-in slide-in-from-right duration-200 shadow-2xl flex flex-col">
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h2 className="font-bold text-primary-navy">Menü</h2>
+                            <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        {/* Reuse the Sidebar Content */}
+                        <div className="flex-1 overflow-y-auto">
+                            <TradeSidebar />
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

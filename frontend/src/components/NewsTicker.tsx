@@ -1,43 +1,69 @@
 'use client';
 
-export default function NewsTicker({ news }: { news: any[] }) {
+import { useEffect, useState } from 'react';
+import { useMarket } from '@/context/MarketContext';
+
+export default function NewsTicker() {
+    const { intelligence } = useMarket();
+    const [news, setNews] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (intelligence && intelligence.news) {
+            setNews(intelligence.news);
+        }
+    }, [intelligence]);
+
+    if (!news || news.length === 0) return null;
+
     return (
-        <div className="glass" style={{
-            padding: '12px 24px',
-            borderRadius: 'var(--radius)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '24px',
-            overflow: 'hidden',
-            marginBottom: '32px',
-            border: '1px solid rgba(255,255,255,0.05)'
-        }}>
-            <div style={{
-                backgroundColor: 'var(--primary)',
-                color: 'black',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                fontSize: '11px',
-                fontWeight: 'bold',
-                whiteSpace: 'nowrap'
-            }}>
-                SON DAKİKA
+        <div className="fixed bottom-0 left-0 w-full bg-background-paper border-t border-border h-8 flex items-center z-50 overflow-hidden">
+            <div className="flex items-center px-4 bg-primary/10 h-full border-r border-border shrink-0">
+                <span className="text-primary text-xs font-bold uppercase tracking-wider">LATEST WIRE</span>
             </div>
-            <div style={{ display: 'flex', gap: '40px', animation: 'ticker 30s linear infinite' }}>
-                {news.map(item => (
-                    <div key={item.id} style={{ display: 'flex', gap: '8px', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                        <span style={{ fontSize: '13px' }}>{item.content}</span>
-                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{item.timestamp}</span>
-                    </div>
-                ))}
+
+            <div className="overflow-hidden relative w-full h-full flex items-center">
+                <div className="animate-marquee whitespace-nowrap flex items-center gap-8 pl-4">
+                    {news.map((item: any, i) => (
+                        <div key={item.id + i} className="flex items-center gap-2 text-xs">
+                            <span className={`font-mono font-bold ${item.impact === 'HIGH' ? 'text-red-400' : 'text-text-secondary'
+                                }`}>
+                                [{item.source}]
+                            </span>
+                            <span className="text-text-primary">
+                                {item.headline}
+                            </span>
+                            <span className="text-text-secondary opacity-50 text-[10px]">
+                                {new Date(item.timestamp).toLocaleTimeString()}
+                            </span>
+                        </div>
+                    ))}
+                    {/* Duplicate for infinite loop illusion */}
+                    {news.map((item: any, i) => (
+                        <div key={item.id + i + 'dup'} className="flex items-center gap-2 text-xs">
+                            <span className={`font-mono font-bold ${item.impact === 'HIGH' ? 'text-red-400' : 'text-text-secondary'
+                                }`}>
+                                [{item.source}]
+                            </span>
+                            <span className="text-text-primary">
+                                {item.headline}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <style jsx>{`
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
+                .animate-marquee {
+                    animation: marquee 40s linear infinite;
+                }
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .animate-marquee:hover {
+                    animation-play-state: paused;
+                }
+            `}</style>
         </div>
     );
 }

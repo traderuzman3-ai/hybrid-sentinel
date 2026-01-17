@@ -45,6 +45,23 @@ export default function Navbar() {
                             <Link href="/admin/ledger" className={pathname === '/admin/ledger' ? 'active-link' : 'nav-link'} style={{ color: 'var(--warning)' }}>Talepler</Link>
                         </div>
                     )}
+                    {/* Live Support Button */}
+                    <a
+                        href="/support"
+                        className="hidden md:flex relative items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold text-xs shadow-lg hover:shadow-emerald-500/50 transition-all duration-300"
+                        style={{
+                            boxShadow: '0 0 15px rgba(16, 185, 129, 0.5), 0 0 30px rgba(16, 185, 129, 0.3)',
+                            animation: 'neonPulse 2s ease-in-out infinite',
+                            marginLeft: 'auto',
+                            textDecoration: 'none'
+                        }}
+                    >
+                        <span className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-emerald-400 to-green-400 opacity-50 blur-sm animate-pulse"></span>
+                        <span className="relative flex items-center gap-1.5">
+                            <span className="text-sm">🎧</span>
+                            <span>Canlı Destek</span>
+                        </span>
+                    </a>
                 </div>
             )}
 
@@ -102,6 +119,6 @@ export default function Navbar() {
           font-weight: 500;
         }
       `}</style>
-        </nav>
+        </nav >
     );
 }

@@ -1,10 +1,11 @@
 'use client';
 
-import { createChart, ColorType, IChartApi, ISeriesApi } from 'lightweight-charts';
+import { createChart, ColorType, IChartApi, ISeriesApi, Time, CandlestickData } from 'lightweight-charts';
 import { useEffect, useRef } from 'react';
 
 interface ChartProps {
-    data: { time: string; open: number; high: number; low: number; close: number }[];
+    // time can be either YYYY-MM-DD string (daily+) or Unix timestamp number (intraday)
+    data: { time: string | number; open: number; high: number; low: number; close: number }[];
     colors?: {
         backgroundColor?: string;
         lineColor?: string;
@@ -40,9 +41,44 @@ export const MarketChart = ({
             },
             width: chartContainerRef.current.clientWidth,
             height: 480, // Taller chart
+            localization: {
+                locale: 'tr-TR',
+                dateFormat: 'dd MMM yyyy',
+                // Hem tarih hem saati zorla göster
+                timeFormatter: (time: number | string) => {
+                    const date = new Date(typeof time === 'number' ? time * 1000 : time);
+                    if (isNaN(date.getTime())) return String(time);
+
+                    // Tarih ve Saati beraber döndür: "17 Oca 2026 14:30"
+                    return date.toLocaleString('tr-TR', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            },
             timeScale: {
                 borderVisible: false,
                 borderColor: '#e2e8f0',
+                // Allow scrolling
+                fixLeftEdge: false,
+                fixRightEdge: false,
+                // Prevents gaps for weekends/holidays in stock data
+                timeVisible: true,
+                secondsVisible: false,
+            },
+            handleScroll: {
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: true,
+            },
+            handleScale: {
+                axisPressedMouseMove: true,
+                mouseWheel: true,
+                pinch: true,
             },
             rightPriceScale: {
                 borderVisible: false,
@@ -60,34 +96,28 @@ export const MarketChart = ({
             wickDownColor: downColor,
         });
 
-        mainSeries.setData(data);
-
-        // Bollinger Bands Calculation (based on close price)
-        const closeData = data.map(d => ({ time: d.time, value: d.close }));
-        const period = 20;
-        const bbData = closeData.map((d, i) => {
-            if (i < period) return null;
-            const slice = closeData.slice(i - period, i);
-            const avg = slice.reduce((acc, curr) => acc + curr.value, 0) / period;
-            const stdDev = Math.sqrt(slice.reduce((acc, curr) => acc + Math.pow(curr.value - avg, 2), 0) / period);
-            return { time: d.time, upper: avg + stdDev * 2, lower: avg - stdDev * 2 };
-        }).filter(Boolean) as any[];
-
-        if (bbData.length > 0) {
-            const upperBandSeries = chart.addLineSeries({
-                color: 'rgba(15, 23, 42, 0.2)', // Darker line for light mode
-                lineWidth: 1,
-                title: 'Upper BB'
-            });
-            const lowerBandSeries = chart.addLineSeries({
-                color: 'rgba(15, 23, 42, 0.2)',
-                lineWidth: 1,
-                title: 'Lower BB'
+        // Defensive programming: Sort and Deduplicate data to prevent "Assertion failed"
+        const sortedData = [...data]
+            .sort((a, b) => {
+                if (typeof a.time === 'string' && typeof b.time === 'string') {
+                    return a.time.localeCompare(b.time);
+                }
+                return (a.time as unknown as number) - (b.time as unknown as number);
             });
 
-            upperBandSeries.setData(bbData.map(d => ({ time: d.time, value: d.upper })));
-            lowerBandSeries.setData(bbData.map(d => ({ time: d.time, value: d.lower })));
+        const uniqueData: typeof data = [];
+        const seenTimes = new Set();
+
+        for (const item of sortedData) {
+            if (!seenTimes.has(item.time)) {
+                seenTimes.add(item.time);
+                uniqueData.push(item);
+            }
         }
+
+        mainSeries.setData(uniqueData as CandlestickData<Time>[]);
+
+        // Bollinger Bands Removed per user request
 
         chart.timeScale().fitContent();
         chartRef.current = chart;

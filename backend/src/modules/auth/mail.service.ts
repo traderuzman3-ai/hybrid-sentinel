@@ -1,18 +1,16 @@
 import nodemailer from 'nodemailer';
 
-// Brevo SMTP transporter
+// Gmail SMTP transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false,
+    service: 'gmail',
     auth: {
-        user: process.env.BREVO_SMTP_USER || 'a0231a001@smtp-brevo.com',
-        pass: process.env.BREVO_SMTP_KEY || ''
+        user: 'traderuzman3@gmail.com', // Kullanıcının Gmail adresi
+        pass: 'zwuj gliz kjpn cowt'     // Uygulama şifresi
     }
 });
 
 // Frontend URL for verification links
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://hybrid-sentinel-r1mg.vercel.app';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 export class MailService {
     /**
@@ -21,7 +19,7 @@ export class MailService {
     public static async sendMail(to: string, subject: string, html: string) {
         try {
             const info = await transporter.sendMail({
-                from: '"Hybrid Sentinel" <ppoyrazyilmazzz@gmail.com>',
+                from: '"Hybrid Sentinel" <traderuzman3@gmail.com>',
                 to,
                 subject,
                 html
@@ -36,7 +34,7 @@ export class MailService {
     }
 
     public static async sendVerificationEmail(to: string, token: string) {
-        const link = `${FRONTEND_URL}/auth/verify?token=${token}`;
+        const link = `${FRONTEND_URL}/auth/verify-email?token=${token}`;
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1a365d;">🔐 Hesabınızı Doğrulayın</h2>

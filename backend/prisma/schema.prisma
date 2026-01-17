@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,171 +7,168 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Kullanıcı Modeli
-model User {
-  id                     String      @id @default(uuid())
-  email                  String      @unique
-  passwordHash           String
-  firstName              String?
-  lastName               String?
-  accountLevel           String      @default("STARTER") // STARTER, SILVER, GOLD, PLATINUM
-  accountType            String      @default("REAL")    // REAL, DEMO
-  kycTier                Int         @default(0)         // 0: Unverified, 1: Basic, 2: Advanced, 3: VIP
-  riskScore              Float       @default(0.0)       // AML/Internal risk score
-  isAdmin                Boolean     @default(false)
-  isCorporate            Boolean     @default(false)
-  addressVerified        Boolean     @default(false)
-  
-  // Auth & Security
-  twoFASecret            String?
-  isTwoFAEnabled         Boolean     @default(false)
-  isEmailVerified        Boolean     @default(false)
-  emailVerificationToken String?
-  resetPasswordToken     String?
-  
-  kycStatus              String      @default("NOT_SUBMITTED") // NOT_SUBMITTED, PENDING, APPROVED, REJECTED
-  
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
-
-  // Relations
-  ledgerEntries          LedgerEntry[]
-  wallets                Wallet[]
-  orders                 Order[]
-  positions              Position[]
-  auditLogs              AuditLog[]
-  securityLogs           SecurityLog[]
-  kycDocuments           KycDocument[]
-  priceOverrides         PriceOverride[]
-
-  @@map("users")
-}
-
-model SecurityLog {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  event     String   // "LOGIN", "2FA_ENABLE", "PASSWORD_RESET", etc.
-  ip        String?
-  device    String?
+model audit_logs {
+  id        String   @id
+  userId    String?
+  action    String
+  details   String?
+  ipAddress String?
+  userAgent String?
   createdAt DateTime @default(now())
-
-  @@map("security_logs")
+  users     users?   @relation(fields: [userId], references: [id])
 }
 
-// KYC Dokümanları
-model KycDocument {
-  id              String   @id @default(uuid())
+model kyc_documents {
+  id              String    @id
   userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  documentType    String   // "ID_CARD", "PASSPORT", "DRIVERS_LICENSE", "address_proof"
-  documentCountry String   @default("TR")
-  fileUrl         String   // Encrypted storage path
-  ocrData         String?  // JSON string of automated OCR results
-  livenessScore   Float?   // Result of facial liveness check
-  status          String   @default("PENDING")
-  uploadedAt      DateTime @default(now())
+  documentType    String
+  documentCountry String    @default("TR")
+  fileUrl         String
+  ocrData         String?
+  livenessScore   Float?
+  status          String    @default("PENDING")
+  uploadedAt      DateTime  @default(now())
   reviewedAt      DateTime?
   reviewedBy      String?
-
-  @@map("kyc_documents")
+  users           users     @relation(fields: [userId], references: [id])
 }
 
-// Ledger (Defter) - Para Yönetimi
-model LedgerEntry {
-  id          String   @id @default(uuid())
+model ledger_entries {
+  id          String   @id
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  type        String   // DEPOSIT, WITHDRAWAL, TRADE_PROFIT, TRADE_LOSS, FEE, TRANSFER
+  type        String
   amount      Float
   currency    String   @default("TRY")
   description String?
-  referenceId String?  // EFT/TXID referans numarası
-  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, COMPLETED
-  metadata    String?  // JSON detail: bank_name, tx_hash, etc.
+  referenceId String?
+  status      String   @default("PENDING")
+  metadata    String?
   createdAt   DateTime @default(now())
-
-  @@map("ledger_entries")
+  users       users    @relation(fields: [userId], references: [id])
 }
 
-model Wallet {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  currency    String   // "TRY", "USD", "BTC", "ETH"
-  balance     Float    @default(0)
-  frozen      Float    @default(0) // Faz 3.7 için dondurulmuş bakiye
-  updatedAt   DateTime @updatedAt
+model orders {
+  id        String    @id
+  userId    String
+  symbol    String
+  type      String
+  side      String
+  quantity  Float
+  price     Float?
+  stopPrice Float?
+  status    String    @default("PENDING")
+  metadata  String?
+  filledAt  DateTime?
+  createdAt DateTime  @default(now())
+  users     users     @relation(fields: [userId], references: [id])
+}
+
+model positions {
+  id           String    @id
+  userId       String
+  symbol       String
+  side         String
+  quantity     Float
+  entryPrice   Float
+  currentPrice Float
+  pnl          Float     @default(0)
+  margin       Float
+  leverage     Float     @default(1)
+  isOpen       Boolean   @default(true)
+  openedAt     DateTime  @default(now())
+  closedAt     DateTime?
+  avgPrice     Float     @default(0)
+  users        users     @relation(fields: [userId], references: [id])
+}
+
+model price_overrides {
+  id            String   @id
+  symbol        String   @unique
+  overridePrice Float
+  spread        Float?
+  slippage      Float?
+  isActive      Boolean  @default(true)
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  users         users    @relation(fields: [createdBy], references: [id])
+}
+
+model security_logs {
+  id        String   @id
+  userId    String
+  event     String
+  ip        String?
+  device    String?
+  createdAt DateTime @default(now())
+  users     users    @relation(fields: [userId], references: [id])
+}
+
+model users {
+  id                     String            @id
+  email                  String            @unique
+  passwordHash           String
+  firstName              String?
+  lastName               String?
+  accountLevel           String            @default("STARTER")
+  accountType            String            @default("REAL")
+  kycTier                Int               @default(0)
+  riskScore              Float             @default(0.0)
+  isAdmin                Boolean           @default(false)
+  isCorporate            Boolean           @default(false)
+  addressVerified        Boolean           @default(false)
+  twoFASecret            String?
+  isTwoFAEnabled         Boolean           @default(false)
+  isEmailVerified        Boolean           @default(false)
+  emailVerificationToken String?
+  resetPasswordToken     String?
+  kycStatus              String            @default("NOT_SUBMITTED")
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime
+  audit_logs             audit_logs[]
+  kyc_documents          kyc_documents[]
+  ledger_entries         ledger_entries[]
+  orders                 orders[]
+  positions              positions[]
+  price_overrides        price_overrides[]
+  security_logs          security_logs[]
+  wallets                wallets[]
+  watchlists             watchlists[]
+  alarms                 alarms[]
+}
+
+model wallets {
+  id         String   @id
+  userId     String
+  currency   String
+  balance    Float    @default(0)
+  frozen     Float    @default(0)
+  updatedAt  DateTime
+  balance_t1 Float    @default(0)
+  balance_t2 Float    @default(0)
+  users      users    @relation(fields: [userId], references: [id])
 
   @@unique([userId, currency])
-  @@map("wallets")
 }
 
-// Emir (Order) Modeli
-model Order {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  symbol      String   // "BTCUSDT", "AAPL", "THYAO"
-  type        String   // MARKET, LIMIT, STOP, TAKE_PROFIT
-  side        String   // BUY, SELL
-  quantity    Float
-  price       Float?   // Limit/Stop için
-  stopPrice   Float?   // Stop order için
-  status      String   @default("PENDING") // PENDING, FILLED, PARTIALLY_FILLED, CANCELLED, REJECTED
-  metadata    String?  // JSON detail for advanced orders (OCO, Bracket, etc.)
-  filledAt    DateTime?
-  createdAt   DateTime @default(now())
+model watchlists {
+  id        String   @id
+  userId    String
+  symbol    String
+  createdAt DateTime @default(now())
+  users     users    @relation(fields: [userId], references: [id])
 
-  @@map("orders")
+  @@unique([userId, symbol])
 }
 
-// Pozisyon (Position) Modeli
-model Position {
+model alarms {
   id          String   @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
   symbol      String
-  side        String   // BUY, SELL
-  quantity    Float
-  entryPrice  Float
-  currentPrice Float
-  pnl         Float    @default(0)
-  margin      Float
-  leverage    Float    @default(1)
-  isOpen      Boolean  @default(true)
-  openedAt    DateTime @default(now())
-  closedAt    DateTime?
-
-  @@map("positions")
-}
-
-// Fiyat Override (Admin Kontrol)
-model PriceOverride {
-  id          String   @id @default(uuid())
-  symbol      String   @unique
-  overridePrice Float
-  spread      Float?   // Spread ayarı
-  slippage    Float?   // Kayma ayarı
+  targetPrice Float
+  condition   String   // 'ABOVE' or 'BELOW'
   isActive    Boolean  @default(true)
-  createdBy   String   // Admin user ID
-  user        User     @relation(fields: [createdBy], references: [id])
+  isTriggered Boolean  @default(false)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("price_overrides")
-}
-
-// Audit Log (Denetim Kaydı)
-model AuditLog {
-  id          String   @id @default(uuid())
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  action      String   // "LOGIN", "DEPOSIT", "ORDER_PLACED", "PRICE_OVERRIDE"
-  details     String?  // JSON string
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-
-  @@map("audit_logs")
+  users       users    @relation(fields: [userId], references: [id])
 }

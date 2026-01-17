@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { placeOrder, getOpenPositions } from './trade.controller';
+import { placeOrder, getOpenPositions, getOrderHistory } from './trade.controller';
 
 export default async function tradeRoutes(fastify: FastifyInstance) {
     fastify.post('/trade/order', {
@@ -9,4 +9,8 @@ export default async function tradeRoutes(fastify: FastifyInstance) {
     fastify.get('/trade/positions', {
         onRequest: [fastify.authenticate]
     }, getOpenPositions);
+
+    fastify.get('/trade/history', {
+        onRequest: [fastify.authenticate]
+    }, getOrderHistory);
 }

@@ -26,10 +26,9 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
         // Şifre hash'leme
         const passwordHash = await argon2.hash(password);
 
-        // Verification token oluştur (sadece gerçek hesaplar için)
+        // Verification token oluştur
         const crypto = require('crypto');
-        const isDemo = accountType === 'DEMO';
-        const emailVerificationToken = isDemo ? null : crypto.randomBytes(32).toString('hex');
+        const emailVerificationToken = crypto.randomBytes(32).toString('hex');
 
         // Kullanıcı oluştur
         const user = await prisma.user.create({
@@ -40,18 +39,18 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                 lastName,
                 emailVerificationToken,
                 accountType: accountType || 'REAL',
-                isEmailVerified: isDemo, // Demo hesaplar otomatik doğrulanmış
+                isEmailVerified: accountType === 'DEMO', // Demo hesaplar otomatik onaylı
                 // Otomatik cüzdan oluşturma
                 wallets: {
                     create: [
                         {
                             currency: 'TRY',
-                            balance: isDemo ? 100000 : 0, // Demo hesaplara 100.000 TL bakiye
+                            balance: accountType === 'DEMO' ? 100000 : 0, // Demo hesaplara 100.000 TL bakiye
                             frozen: 0
                         },
                         {
                             currency: 'USD',
-                            balance: isDemo ? 10000 : 0, // Demo hesaplara 10.000 USD bakiye
+                            balance: accountType === 'DEMO' ? 10000 : 0, // Demo hesaplara 10.000 USD bakiye
                             frozen: 0
                         }
                     ]
@@ -69,12 +68,10 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
             }
         });
 
-        // Sadece gerçek hesaplar için email gönder
-        if (!isDemo) {
+        // Email gönder (Sadece REAL hesaplar için)
+        if (user.accountType === 'REAL') {
             const { MailService } = require('./mail.service');
             await MailService.sendVerificationEmail(email, emailVerificationToken);
-        } else {
-            console.log(`✅ Demo hesap oluşturuldu: ${email} - email doğrulaması atlandı`);
         }
 
         // Audit log
@@ -110,9 +107,34 @@ export async function login(request: FastifyRequest, reply: FastifyReply) {
             return reply.status(401).send({ error: 'Email veya şifre hatalı' });
         }
 
-        // Hesap aktif mi?
+        // Hesap aktif mi? (Email Onayı)
         if (!user.isEmailVerified) {
-            return reply.status(403).send({ error: 'Lütfen önce e-posta adresinizi doğrulayın.' });
+            return reply.status(403).send({ error: 'Lütfen önce e-posta adresinizi doğrulayın. Spam klasörünü kontrol etmeyi unutmayın.' });
+        }
+
+        // KYC ve Hesap Durumu Kontrolleri (Grand Simulation Rules)
+        // 1. KYC Yüklenmiş mi?
+        if (user.kycStatus === 'NOT_SUBMITTED' && user.accountType === 'REAL') {
+            return reply.status(403).send({
+                error: 'KYC_REQUIRED', // Frontend bunu yakalayıp KYC sayfasına yönlendirecek
+                message: 'İşlem yapabilmek için kimlik doğrulama belgelerinizi yüklemelisiniz.'
+            });
+        }
+
+        // 2. Admin Onayı Bekliyor mu?
+        if (user.kycStatus === 'PENDING' && user.accountType === 'REAL') {
+            return reply.status(403).send({
+                error: 'APPROVAL_PENDING',
+                message: 'Hesabınız yönetici onayı bekliyor. Bu işlem 24 saate kadar sürebilir.'
+            });
+        }
+
+        // 3. KYC Reddedilmiş mi?
+        if (user.kycStatus === 'REJECTED') {
+            return reply.status(403).send({
+                error: 'ACCOUNT_SUSPENDED',
+                message: 'Kimlik doğrulamanız reddedildi. Lütfen destek ekibiyle iletişime geçin.'
+            });
         }
 
         // Şifre kontrolü

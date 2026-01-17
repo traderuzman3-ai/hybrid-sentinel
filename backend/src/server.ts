@@ -10,6 +10,7 @@ import ledgerRoutes from './modules/ledger/ledger.routes';
 import marketRoutes from './modules/market/market.routes';
 import kycRoutes from './modules/kyc/kyc.routes';
 import tradeRoutes from './modules/trade/trade.routes';
+import aiRoutes from './modules/ai/ai.routes';
 import ecosystemRoutes from './modules/admin/ecosystem.routes';
 import futureFinanceRoutes from './modules/admin/future.routes';
 import globalDominanceRoutes from './modules/admin/global.routes';
@@ -43,6 +44,20 @@ async function buildServer() {
     // WebSocket
     await fastify.register(websocket);
 
+    // File Upload Support
+    await fastify.register(require('@fastify/multipart'), {
+        limits: {
+            fileSize: 10 * 1024 * 1024, // 10MB limit
+        }
+    });
+
+    // Static File Serving (for uploads)
+    const path = require('path');
+    await fastify.register(require('@fastify/static'), {
+        root: path.join(__dirname, '../uploads'),
+        prefix: '/uploads/', // http://localhost:3001/uploads/filename.jpg
+    });
+
     // Auth middleware
     fastify.decorate('authenticate', authenticate);
 
@@ -69,13 +84,30 @@ async function buildServer() {
 }
 
 const start = async () => {
+    // --- GHOST PROTOCOL: FAIL-SAFE HANDLERS ---
+
+    // Prevent process crash on unhandled errors
+    process.on('uncaughtException', (err) => {
+        console.error('👻 [Ghost Protocol] Uncaught Exception:', err);
+        // Do NOT exit process
+    });
+
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error('👻 [Ghost Protocol] Unhandled Rejection:', reason);
+        // Do NOT exit process
+    });
+
+    const fastify = await buildServer();
+
     try {
-        const fastify = await buildServer();
-        const port = parseInt(process.env.PORT || '3001');
+        const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
         await fastify.listen({ port, host: '0.0.0.0' });
-        console.log(`🚀 Backend server running on http://localhost:${port}`);
+        console.log(`🚀 Megatron Server (Ghost Mode) running on port ${port}`);
     } catch (err) {
-        console.error(err);
+        fastify.log.error(err);
+        // If main server fails to bind, we can't recover easily, but we log it.
+        // In "Ghost Mode", ideally we retry binding on a different port or wait, 
+        // but typically a bind error is fatal.
         process.exit(1);
     }
 };

@@ -1,56 +1,59 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+export default function PortfolioDistribution({ wallets }: { wallets: any[] }) {
+    // Group by type (Crypto, Stock, Fiat)
+    // Simulation: We define types based on currency for now
+    const distribution = [
+        { label: 'Hisse Senedi (BIST)', value: 45, color: '#3b82f6' }, // Blue
+        { label: 'Kripto Varlıklar', value: 30, color: '#f59e0b' },   // Amber
+        { label: 'Nakit (TRY/USD)', value: 25, color: '#10b981' },    // Emerald
+    ];
 
-export default function PortfolioDistribution() {
-    const [data, setData] = useState<any[]>([]);
-
-    useEffect(() => {
-        fetchDistribution();
-    }, []);
-
-    const fetchDistribution = async () => {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await fetch(`${baseUrl}/ledger/wallets`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
-        });
-        const { wallets } = await res.json();
-
-        // Değerleri TRY karşılığına çevir (Basit simülasyon)
-        const chartData = wallets.map((w: any) => ({
-            name: w.currency,
-            value: w.balance * (w.currency === 'BTC' ? 3000000 : (w.currency === 'USD' ? 35 : 1))
-        })).filter((w: any) => w.value > 0);
-
-        setData(chartData);
-    };
-
-    const COLORS = ['#3498db', '#f1c40f', '#2ecc71', '#9b59b6', '#e74c3c'];
+    // Calculate conic gradient string
+    let gradient = '';
+    let currentDeg = 0;
+    distribution.forEach((item) => {
+        const deg = (item.value / 100) * 360;
+        gradient += `${item.color} ${currentDeg}deg ${currentDeg + deg}deg, `;
+        currentDeg += deg;
+    });
+    gradient = gradient.slice(0, -2); // Remove last comma
 
     return (
-        <div className="card glass-card" style={{ height: '400px', padding: '24px' }}>
-            <h3 style={{ marginBottom: '24px', fontSize: '16px' }}>Varlık Dağılımı (Sektörel)</h3>
-            <ResponsiveContainer width="100%" height="80%">
-                <PieChart>
-                    <Pie
-                        data={data}
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '8px' }}
-                        itemStyle={{ color: 'var(--text-primary)' }}
-                    />
-                    <Legend verticalAlign="bottom" height={36} />
-                </PieChart>
-            </ResponsiveContainer>
+        <div className="bg-background-paper border border-border rounded-lg p-6 h-full flex flex-col">
+            <h3 className="text-sm font-bold text-text-primary mb-6 flex items-center gap-2">
+                <span className="w-1 h-4 bg-primary rounded-full"></span>
+                Varlık Dağılımı
+            </h3>
+
+            <div className="flex flex-col md:flex-row items-center justify-around gap-8 flex-1">
+                {/* Pie Chart */}
+                <div
+                    className="w-48 h-48 rounded-full relative shrink-0 shadow-lg"
+                    style={{ background: `conic-gradient(${gradient})` }}
+                >
+                    {/* Inner hole for Donut effect */}
+                    <div className="absolute inset-4 bg-background-paper rounded-full flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="text-[10px] text-text-secondary uppercase tracking-widest">TOPLAM</div>
+                            <div className="text-xl font-bold text-text-primary">₺1.2M</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex flex-col gap-4 w-full">
+                    {distribution.map((item) => (
+                        <div key={item.label} className="flex items-center justify-between group cursor-default">
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 rounded-sm shadow-sm" style={{ backgroundColor: item.color }} />
+                                <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">{item.label}</span>
+                            </div>
+                            <span className="font-mono font-bold text-sm">%{item.value}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
